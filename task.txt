@@ -1,0 +1,6 @@
+Câu 1: a, b -> Tuấn. 
+(c,d,e) -> Phong.
+Câu 2: -> Đăng
+Câu 3, 4, 5 -> (Đạt, Dũng)
+Tìm constant -> (Tuấn, Đăng)
+Câu 6: a -> Tuấn. (b,c) -> (Phong, Dũng)
