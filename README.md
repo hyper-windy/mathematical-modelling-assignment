@@ -1,2 +1,2 @@
-# mathematicalModellingAssignment
+# Mathematical Modelling Assignment
 Collaborator: Tuan Quach Minh, Dung Tien Nguyen, Hai Dang Nguyen Truong, Dat Nguyen Tan
