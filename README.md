@@ -1,5 +1,5 @@
 # Mathematical Modelling Assignment
-Collaborator: Tuan Quach Minh, Dung Tien Nguyen, Hai Dang Nguyen Truong, Dat Nguyen Tan
+Collaborator: Tuan Quach Minh,Tien Dung Vo Van, Hai Dang Nguyen Truong, Dat Nguyen Tan
 
 **Đề bài:** https://drive.google.com/drive/folders/1NiXtTskr4JAvilKvaQarCDTtTzmTJUdc
 **Link colab cho bài 6:** https://colab.research.google.com/drive/1nNh7coSA3OUyyGiT2avAe7MEbr3CIyTA?usp=sharing  
