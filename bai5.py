@@ -4,7 +4,7 @@ n_heatCO2 = 0.057
 n_heatVap = 4.43 * (10 ** (-8))
 n_roofThr = 0.9
 n_insScr = 1
-n_side = 
+n_side = 0
 n_sideThr = 
 n_pad =
 
@@ -15,15 +15,11 @@ h_air = 3.8
 h_Gh = 4.2
 h_flr = 0.02
 
-H_blowAir
-
 A_flr = 1.4 * (10 ** 4)
 A_roof =
 
-C_d =
-C_w =
-
-M_ch2o = 30
+C_d_Gh = 0.75
+C_w_Gh = 0.09
 
 o_fog = 0
 o_pad = 16.7
@@ -39,37 +35,40 @@ p_air0 = 1.20
 p_air = 
 
 r_b = 275
-r_s = 
 r_sMin = 82
+r_s = 
 
-
-Delta_H = 2.45 * (10 ** 6)
-
-K_thScr = 0.05 * (10 ** -3)
 
 e_flr = 1
 e_can = 1
 e_sky = 1
 
-landa_flr = 1.7
-
-g = 9.81
-
 M_water = 18
 M_air = 28.96
-
-y = 65.8
-w = 1.99 * (10 **-7)
-R = 8314
-o = 5.670 * (10 ** -8)
+M_ch2o = 30
 
 c_leakage = 10**-4
 c_pFlr = 0.88 * (10 ** 3)
 c_pThr = 1.8 * (10 ** 3)
 c_pAir
 
+y = 65.8
+w = 1.99 * (10 **-7)
+R = 8314
+o = 5.670 * (10 ** -8)
+
+landa_flr = 1.7
+
+g = 9.81
+
+Delta_H = 2.45 * (10 ** 6)
+
+K_thScr = 0.05 * (10 ** -3)
+
 cap_leaf = 1200
 ####################
+
+
 def f_leakage(v_wind):
     if (v_wind < 0.25):
         return 0.25 * c_leakage
