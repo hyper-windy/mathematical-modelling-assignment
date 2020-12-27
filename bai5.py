@@ -4,27 +4,31 @@ n_heatCO2 = 0.057
 n_heatVap = 4.43 * (10 ** (-8))
 n_roofThr = 0.9
 n_insScr = 1
-n_side = 0
-n_sideThr = 0
-n_pad 
+n_side = 
+n_sideThr = 
+n_pad =
 
 h_roof = 0
 h_sideRoof = 0
-h_vent
+h_vent = 0.68
+h_air = 3.8
+h_Gh = 4.2
+h_flr = 0.02
 
 H_blowAir
 
-A_flr = 2300
-A_roof 
+A_flr = 1.4 * (10 ** 4)
+A_roof =
 
-C_d 
-C_w 
+C_d =
+C_w =
 
 M_ch2o = 30
 
 o_fog = 0
 o_pad = 16.7
 o_ventForce = 0
+o_exitCO2 = 7.2 * (10 ** 4)
 
 s_insScr = 1
 
@@ -32,12 +36,14 @@ p_water = 1000
 p_thrScr = 0.2 * (10**3)
 p_flr = 2300
 p_air0 = 1.20
-p_air
+p_air = 
 
-r_b 
-r_s
+r_b = 275
+r_s = 
+r_sMin = 82
 
-DeltaH 
+
+Delta_H = 2.45 * (10 ** 6)
 
 K_thScr = 0.05 * (10 ** -3)
 
@@ -58,6 +64,8 @@ R = 8314
 o = 5.670 * (10 ** -8)
 
 c_leakage = 10**-4
+c_pFlr = 0.88 * (10 ** 3)
+c_pThr = 1.8 * (10 ** 3)
 c_pAir
 
 cap_leaf = 1200
