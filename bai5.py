@@ -1,24 +1,53 @@
 n_heatCO2 = 0.057
 n_heatVap = 4.43 * 10 ** (-8)
+n_roofThr = 0.9
+n_insScr = 0
+
+o_fog = 0
+o_pad = 16.7
+o_ventForce = 0
+
+s_insScr = 1
+
 p_water = 1000
+p_thrScr = 0.2 * 10**3
+p_flr = 2300
+
+K_thScr = 1 * 10 ** -3
+
 g = 9.81
+
 M_water = 18
 M_air = 28.96
+
 R = 8314
+c_leakage = 10**-4
 
 ####################
-def MV_845(VP1, T1, VP2, T2, f):
-    return M_water * R * f * (VP1 / (T1 + 273.15) - VP2 / (T2 + 273.15))
+def f_leakage(v_wind):
+    if (v_wind < 0.25):
+        return 0.25 * c_leakage
+    else:
+        return c_leakage * v_wind
 
-def cap_VP_air(h_air, T_air):
-    return (M_water * h_air)/(R * T_air + 273.15)
+def f_VentForced(n_roof):
+    if (n_roof > n_roofThr):
+        return n_insScr
 
-def MV_8_43(VP1, VP2, HEC):
+def MV_843(VP1, VP2, HEC):
     if (VP1 < VP2):
         return 0
     else:
         return (6.4 * (10.0 ** -9)) * HEC * (VP1 - VP2)
-    
+ 
+def MV_845(VP1, T1, VP2, T2, f):
+    return M_water * R * f * (VP1 / (T1 + 273.15) - VP2 / (T2 + 273.15))
+
+
+
+def cap_VP_air(h_air, T_air):
+    return (M_water * h_air)/(R * T_air + 273.15)
+  
 def MV_can_air(VP_can, VP_air, pAir, LAI, rb, rs):
     VEC = VEC_canAir(pAir, LAI, rb,rs)
     return VEC * (VP_can - VP_air)
@@ -45,7 +74,6 @@ def MV_air_top(M_water, R, VP1, T1, VP2, T2):
 
 def f_VentSide():
 
-def f_VentForced():
 
 def MV_air_out(VP1, T1, VP2, T2):
     return MV_845(VP1, T1, VP2, T2, f_VentSide + f_VentForced)
