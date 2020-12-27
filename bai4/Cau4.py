@@ -1,3 +1,4 @@
+import csv
 def rk4(dx, x0, y0, x, h): 
     # Count number of iterations using step size or 
     # step height h 
@@ -26,6 +27,7 @@ def euler(dx, x0, y, h, x ):
     while x0 < x: 
         temp = y 
         y = y + h * dx(x0, y) 
-        x0 = x0 + h 
+        x0 = x0 + h
   
     return y
+    
