@@ -1,7 +1,26 @@
+##Du lieu lay o Netherland
+
 n_heatCO2 = 0.057
-n_heatVap = 4.43 * 10 ** (-8)
+n_heatVap = 4.43 * (10 ** (-8))
 n_roofThr = 0.9
-n_insScr = 0
+n_insScr = 1
+n_side = 0
+n_sideThr = 0
+n_pad 
+
+h_roof = 0
+h_sideRoof = 0
+h_vent
+
+H_blowAir
+
+A_flr = 2300
+A_roof 
+
+C_d 
+C_w 
+
+M_ch2o = 30
 
 o_fog = 0
 o_pad = 16.7
@@ -10,19 +29,38 @@ o_ventForce = 0
 s_insScr = 1
 
 p_water = 1000
-p_thrScr = 0.2 * 10**3
+p_thrScr = 0.2 * (10**3)
 p_flr = 2300
+p_air0 = 1.20
+p_air
 
-K_thScr = 1 * 10 ** -3
+r_b 
+r_s
+
+DeltaH 
+
+K_thScr = 0.05 * (10 ** -3)
+
+e_flr = 1
+e_can = 1
+e_sky = 1
+
+landa_flr = 1.7
 
 g = 9.81
 
 M_water = 18
 M_air = 28.96
 
+y = 65.8
+w = 1.99 * (10 **-7)
 R = 8314
-c_leakage = 10**-4
+o = 5.670 * (10 ** -8)
 
+c_leakage = 10**-4
+c_pAir
+
+cap_leaf = 1200
 ####################
 def f_leakage(v_wind):
     if (v_wind < 0.25):
@@ -67,7 +105,7 @@ def MV_blow_air():
 def MV_air_thscr():
 
 def f_thscr(U_thscr, K_thscr, T_air, T_top, P_airMean, p_Air, p_Top):
-    return U_thscr * K_thscr * abs(T_air - T_top) ** (2 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * p_airMean) * (p_Air - p_Top)) ** (1 / 3)
+    return U_thscr * K_thscr * abs(T_air - T_top) ** (2 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * P_airMean) * (p_Air - p_Top)) ** (1 / 3)
     
 def MV_air_top(M_water, R, VP1, T1, VP2, T2):
     return MV_845(M_water, R, VP1, T1, VP2, T2, f_thscr)
@@ -89,5 +127,4 @@ def MV_top_out(M_water, R, VP1, T1, VP2, T2):
     return MV_845(M_water, R, VP1, T1, VP2, T2, f_VentRoof)
 
 def MV_top_covin():
-
 
