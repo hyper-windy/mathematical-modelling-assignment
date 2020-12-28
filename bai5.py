@@ -8,18 +8,20 @@ n_side = 0
 n_sideThr = 
 n_pad =
 
+C_d_Gh = 0.75
+C_w_Gh = 0.09
+C_macBuf = 
+
 h_roof = 0
 h_sideRoof = 0
 h_vent = 0.68
 h_air = 3.8
 h_Gh = 4.2
 h_flr = 0.02
+h_Cbuf = 
 
 A_flr = 1.4 * (10 ** 4)
 A_roof =
-
-C_d_Gh = 0.75
-C_w_Gh = 0.09
 
 o_fog = 0
 o_pad = 16.7
@@ -56,6 +58,7 @@ y = 65.8
 w = 1.99 * (10 **-7)
 R = 8314
 o = 5.670 * (10 ** -8)
+P = 
 
 landa_flr = 1.7
 
@@ -75,6 +78,11 @@ def f_leakage(v_wind):
     else:
         return c_leakage * v_wind
 
+def f_thscr(U_thscr, T_air, T_top, P_airMean, p_Top):
+    return U_thscr * K_thscr * abs(T_air - T_top) ** (2 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * P_airMean) * (p_Air - p_Top)) ** (1 / 3)
+
+def f_VentRoof():
+
 def f_VentForced(n_roof):
     if (n_roof > n_roofThr):
         return n_insScr
@@ -87,8 +95,6 @@ def MV_843(VP1, VP2, HEC):
  
 def MV_845(VP1, T1, VP2, T2, f):
     return M_water * R * f * (VP1 / (T1 + 273.15) - VP2 / (T2 + 273.15))
-
-
 
 def cap_VP_air(h_air, T_air):
     return (M_water * h_air)/(R * T_air + 273.15)
@@ -111,27 +117,21 @@ def MV_blow_air():
 
 def MV_air_thscr():
 
-def f_thscr(U_thscr, K_thscr, T_air, T_top, P_airMean, p_Air, p_Top):
-    return U_thscr * K_thscr * abs(T_air - T_top) ** (2 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * P_airMean) * (p_Air - p_Top)) ** (1 / 3)
-    
-def MV_air_top(M_water, R, VP1, T1, VP2, T2):
-    return MV_845(M_water, R, VP1, T1, VP2, T2, f_thscr)
-
 def f_VentSide():
-
-
-def MV_air_out(VP1, T1, VP2, T2):
-    return MV_845(VP1, T1, VP2, T2, f_VentSide + f_VentForced)
 
 def MV_airout_pad(fpad, M_water, R, VP_air, T_air):
     return fpad * M_water / R * VP_air / (T_air + 273.15)
 
 def MV_air_mech():
 
-def f_VentRoof():
+def MV_top_covin():
+
+def MV_air_top(M_water, R, VP1, T1, VP2, T2):
+    return MV_845(M_water, R, VP1, T1, VP2, T2, f_thscr)
+
+def MV_air_out(VP1, T1, VP2, T2):
+    return MV_845(VP1, T1, VP2, T2, f_VentSide + f_VentForced)
 
 def MV_top_out(M_water, R, VP1, T1, VP2, T2):
     return MV_845(M_water, R, VP1, T1, VP2, T2, f_VentRoof)
-
-def MV_top_covin():
 
