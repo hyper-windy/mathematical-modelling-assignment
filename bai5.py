@@ -122,9 +122,7 @@ def MV_can_air(VP_can, VP_air, pAir, LAI, rb, rs):
     VEC = VEC_canAir(pAir, LAI, rb,rs)
     return VEC * (VP_can - VP_air)
     
-def VEC_canAir(pAir, LAI, rb,rs):
-    c_p_Air = 
-    psy_const = 
+def VEC_canAir(pAir, LAI, rb, rs, psy_const, c_p_Air):
     return (2 * pAir * c_p_Air * LAI) / (delta_H * psy_const * (rb + rs))
     
 def MV_pad_air(p_air, f_pad, n_pad, x_pad, x_out):
