@@ -5,63 +5,82 @@ n_heatVap = 4.43 * (10 ** (-8))
 n_roofThr = 0.9
 n_insScr = 1
 n_side = 0
-n_sideThr = 
-n_pad =
+n_sideThr = -1
+n_pad =-1
 
+###########
 C_d_Gh = 0.75
 C_w_Gh = 0.09
-C_macBuf = 
-
+C_maxBuf = -1
+C_buf = -1
+C_d = -1
+C_w = -1
+###########
 h_roof = 0
 h_sideRoof = 0
 h_vent = 0.68
 h_air = 3.8
 h_Gh = 4.2
 h_flr = 0.02
-h_Cbuf = 
+h_Cbuf = -1
+h_blowAir = -1
 
+###########
 A_flr = 1.4 * (10 ** 4)
-A_roof =
-
+A_roof =-1
+A_side = -1
+###########
 o_fog = 0
 o_pad = 16.7
 o_ventForce = 0
 o_exitCO2 = 7.2 * (10 ** 4)
 
+###########
 s_insScr = 1
 
+###########
 p_water = 1000
 p_thrScr = 0.2 * (10**3)
 p_flr = 2300
 p_air0 = 1.20
-p_air = 
-
+p_air = -1
+p_blow = -1
+p_top = -1
+p_air_mean = -1
+###########
 r_b = 275
 r_sMin = 82
-r_s = 
+r_s = -1
+s_r_s = -1
 
-
+###########
 e_flr = 1
 e_can = 1
 e_sky = 1
 
+###########
 M_water = 18
 M_air = 28.96
 M_ch2o = 30
 
+###########
 c_leakage = 10**-4
 c_pFlr = 0.88 * (10 ** 3)
 c_pThr = 1.8 * (10 ** 3)
-c_pAir = 
+c_pAir = -1
 
+###########
 y = 65.8
 w = 1.99 * (10 **-7)
 R = 8314
 o = 5.670 * (10 ** -8)
-P = 
-P_blow = 
+P = -1
+P_blow = -1
 
+###########
 landa_flr = 1.7
+
+v_wind = -1
 
 g = 9.81
 
@@ -70,11 +89,36 @@ delta_H = 2.45 * (10 ** 6)
 K_thScr = 0.05 * (10 ** -3)
 
 cap_leaf = 1200
+s_MV12 = -0.1
+
 ####################
 # Tinh cac gia tri can thiet
+VP_airWinter = 5.7
+VP_airSummer = 6.4
+VP_outWinter = 0.7
+VP_outSummer = 1.5
 
+T_airWinter = 5.7
+T_airSummer = 6.2
+T_outWinter = 5.9
+T_outSummer = 15.2
+T_air = -1
+T_top = -1
+T_air_mean = -1
+
+v_windWinter = 2.4
+v_windSummer = 4.6
+
+CO2_air = -1
+CO2_top = -1
+
+P_qh = -1
+R_qh = -1
 
 ###################
+def f_pad():
+    return -1
+
 def f_leakage(c_leakage, v_wind):
     if (v_wind < 0.25):
         return 0.25 * c_leakage
@@ -82,7 +126,7 @@ def f_leakage(c_leakage, v_wind):
         return c_leakage * v_wind
 
 def f_thscr(U_thscr, K_thscr, T_air, T_top, P_airMean, p_Air, p_Top):
-    return U_thscr * K_thscr * abs(T_air - T_top) ** (2 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * P_airMean) * (p_Air - p_Top)) ** (1 / 3)
+    return U_thscr * K_thscr * abs(T_air - T_top) ** (2 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * P_airMean) * (p_Air - p_Top)) ** (1 / 2)
 
 def f_VentRoofSide(C_d, C_w, A_flr, U_roof, U_side, A_roof, A_side, h_sideRoof, T_air, T_out, T_air_Mean ,v_wind):
     temp = (U_roof * U_side * A_roof * A_side) / ((U_roof ** 2) * (A_roof ** 2) + (U_side ** 2) * (A_side ** 2))
