@@ -161,7 +161,10 @@ def MV_845(VP1, T1, VP2, T2, f):
 
 def cap_VP_air(h_air, T_air):
     return (M_water * h_air)/(R * T_air + 273.15)
-  
+    
+def cap_VP_top(h_top, T_top):
+    return (M_water * h_air)/(R * T_air + 273.15)
+
 def MV_can_air(VP_can, VP_air, pAir, LAI, rb, rs):
     VEC = VEC_canAir(pAir, LAI, rb,rs)
     return VEC * (VP_can - VP_air)
@@ -169,8 +172,8 @@ def MV_can_air(VP_can, VP_air, pAir, LAI, rb, rs):
 def VEC_canAir(pAir, LAI, rb, rs, psy_const, c_p_Air):
     return (2 * pAir * c_p_Air * LAI) / (delta_H * psy_const * (rb + rs))
     
-def MV_pad_air(p_air, f_pad, n_pad, x_pad, x_out):
-    return p_air * f_pad * (n_pad * (x_pad - x_out) + x_out)
+def MV_pad_air(p_air, U_pad, phi_pad, A_flr, n_pad, x_pad, x_out):
+    return p_air * (U_pad * phi_pad) / A_flr * (n_pad * (x_pad - x_out) + x_out)
 
 def MV_fog_air(U_fog, o_fog, A_flr):
     return U_fog * o_fog / A_flr
@@ -178,8 +181,8 @@ def MV_fog_air(U_fog, o_fog, A_flr):
 def MV_blow_air(n_heatVap, H_blowAir):
     return n_heatVap * H_blowAir
 
-def MV_airout_pad(fpad, VP_air, T_air):
-    return fpad * M_water / R * VP_air / (T_air + 273.15)
+def MV_airout_pad(U_pad, phi_pad, A_flr, VP_air, T_air):
+    return (U_pad * phi_pad) / A_flr * M_water / R * VP_air / (T_air + 273.15)
 
 def MV_air_mech(VP1, VP2, HEC):
     return MV_843(VP1, VP2, HEC)

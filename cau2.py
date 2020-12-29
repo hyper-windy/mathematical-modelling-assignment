@@ -52,7 +52,7 @@ class Dynamic:
         self.MC_air_top = MC_air_top(CO2_air, CO2_top, f_ThScr)
         self.fff_VentSide = f_VentRoofSide(Cd, AFlr, URoof, 0, USide, ASide, g, h_SideRoof, T_air, T_out, T_mean_air, Cw, v_wind)
         self.f_VentRoofSide = f_VentRoofSide(Cd, AFlr, URoof, ARoof, USide, ASide, g, h_SideRoof, T_air, T_out, T_mean_air, Cw, v_wind)
-        self.f_VentSide = f_VentSide(n_side, n_sideThr, n_InsScr, \self.f_leakage, self.fff_VentSide, self.f_VentRoofSide)
+        self.f_VentSide = f_VentSide(n_side, n_sideThr, n_InsScr, self.f_leakage, self.fff_VentSide, self.f_VentRoofSide)
         self.f_VentForced = f_VentForced(n_InsScr, U_VentForced, cap_VentForced, AFlr)
         self.MC_air_out = MC_air_out(CO2_air, CO2_out, self.f_VentSide, self.f_VentForced)
         self.f_VentRoofSide = f_VentRoofSide(Cd, AFlr, URoof, ARoof, USide, ASide, g, h_SideRoof, T_air, T_out, T_mean_air, Cw, v_wind)
@@ -126,8 +126,8 @@ class Dynamic:
     def fff_VentRoof(Cd, URoof, ARoof, AFlr, g, h_roof, T_air, T_out, T_mean_air, Cw, v_wind):      #(17)
         return (Cd*URoof*ARoof/(2*AFlr)*sqrt(g*h_roof*(T_air - T_out)/(2*T_mean_air) +Cw*pow(v_wind, 2)))
 
-    def MC_air_can(M_cbhd, hCBuf, self.P, R):       # (18) luong CO2 bi hap thu vao trong tan la
-        return M_cbhd*hCBuf()*(P-R)
+    def MC_air_can(M_cbhd, hCBuf, R):       # (18) luong CO2 bi hap thu vao trong tan la
+        return M_cbhd*hCBuf()*(self.P-R)
     
     def hCBuf(CBuf, C_Max_Buf):            # (19) he so the hien su ngung qua trinh quang hop
         if CBuf > C_Max_Buf:
@@ -136,7 +136,7 @@ class Dynamic:
             return 1
     
     def P(PMax, Res, CO2_air, CO2_05):               #(22)
-        return (-(CO2_air + CO2_05 + Res*PMax) + sqrt(pow((CO2_air + CO2_05 + Res*PMax),2) - 4*Res*CO2_air*PMax)/(2*Res)
+        return (-(CO2_air + CO2_05 + Res*PMax) + sqrt(pow((CO2_air + CO2_05 + Res*PMax),2) - 4*Res*CO2_air*PMax))/(2*Res)
 
     def PmaxT(k, f):            #(25) toc do quang hop toi da
         return k, f
@@ -152,7 +152,6 @@ class Dynamic:
     
     def pMaxLT(P_MLT, PmaxT, L, L05):           #(29) toc do quang hop toi da
         return (P_MLT * PmaxT() * L)/(L + L05)
-        #(3)-(7), (9)-(19), (22), (25), (28), (24), (27) và (29)
 
 def main():
     #khai bao cac hang o day
