@@ -123,7 +123,7 @@ n_roofThr = 0.9
 
 
 class Solver:
-    def __init__(h_elevation = 0, A_flr = 1.4 * (10 ** 4), A_roof = 1.4*(10**3), A_side = 0, h_air = 3.8, h_gh = 4.2, P_blow = 0, o_fog = 0, o_pad = 16.7, n_pad = 1, c_leakage = 10**-4,K_thScr, C_d = 0.75, C_w = 0.09, h_sideRoof = 0,h_vent = 0.68, n_insScr = 1, o_ventForce = 0):
+    def __init__(h_elevation = 0, A_flr = 1.4 * (10 ** 4), A_roof = 1.4*(10**3), A_side = 0, h_air = 3.8, h_gh = 4.2, P_blow = 0, o_fog = 0, o_pad = 16.7, n_pad = 1, c_leakage = 10**-4,K_thScr = 0.05 * (10 ** -3), C_d = 0.75, C_w = 0.09, h_sideRoof = 0,h_vent = 0.68, n_insScr = 1, o_ventForce = 0):
         self.h_elevation = h_elevation  #do cao nha kinh so voi muc nuoc bien
         self.p_Air = p_Air(self.h_elevation)    #density of the greenhouse air
         self.p_Top = p_Air(self.h_elevation + self.h_air)   #density of the air in the top room
