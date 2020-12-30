@@ -120,16 +120,19 @@ r_b = 275                   #boundary layer resistance
 C_d_Gh = 0.75
 C_w_Gh = 0.09
 n_roofThr = 0.9
-
+c_HECin = 1.86
+COP_mechcool = 0
+P_mechcool = 0
 
 class Solver:
-    def __init__(h_elevation = 0, A_flr = 1.4 * (10 ** 4), A_roof = 1.4*(10**3), A_side = 0, h_air = 3.8, h_gh = 4.2, P_blow = 0, o_fog = 0, o_pad = 16.7, n_pad = 1, c_leakage = 10**-4,K_thScr = 0.05 * (10 ** -3), C_d = 0.75, C_w = 0.09, h_sideRoof = 0,h_vent = 0.68, n_insScr = 1, o_ventForce = 0):
+    def __init__(h_elevation = 0, A_flr = 1.4 * (10 ** 4), A_roof = 1.4*(10**3), A_side = 0, A_cov = 1.8 * (10 ** 4), h_air = 3.8, h_gh = 4.2, P_blow = 0, o_fog = 0, o_pad = 16.7, n_pad = 1, c_leakage = 10**-4,K_thScr = 0.05 * (10 ** -3), C_d = 0.75, C_w = 0.09, h_sideRoof = 0,h_vent = 0.68, n_insScr = 1, o_ventForce = 0):
         self.h_elevation = h_elevation  #do cao nha kinh so voi muc nuoc bien
         self.p_Air = p_Air(self.h_elevation)    #density of the greenhouse air
         self.p_Top = p_Air(self.h_elevation + self.h_air)   #density of the air in the top room
         self.A_flr = A_flr      #dien tich nha kinh
         self.A_roof = A_roof
         self.A_side = A_side
+        self.A_cov = A_cov
         self.h_air = h_air      #chieu cao gian duoi
         self.h_top = h_gh - h_air      #chieu cao gian tren
         self.P_blow = P_blow    #kha nang sinh hoi nuoc cua may suoi
@@ -236,14 +239,28 @@ class Solver:
     def MV_airout_pad(U_pad, phi_pad, A_flr, VP_air, T_air):
         return (U_pad * phi_pad) / A_flr * M_water / R * VP_air / (T_air + 273.15)
 
-    def MV_air_mech(VP1, VP2, HEC):
-        return MV_843(VP1, VP2, HEC)
+    def HEC_air_mech(U_mechcool, T_air, T_mechcool, VP_air, VP_mech):
+        top = U_mechcool * COP_mechcool * P_mechcool / A_flr
+        bot = T_air - T_mechcool + 6.4 * 10**(-9) * delta_H * (VP_air - VP_mech)
+        return top / bot
 
-    def MV_air_thscr(VP1, VP2, HEC):
-        return MV_843(VP1, VP2, HEC)
+    def MV_air_mech(VP_air, VP_mech, U_mechcool, T_air, T_mechcool):
+        HEC = HEC_air_mech(U_mechcool, T_air, T_mechcool, VP_air, VP_mech)
+        return MV_843(VP_air, VP_mech, HEC)
+        
+    def HEC_air_thscr(U_thrScr, T_air, T_thscr):
+        return 1.7 * U_thrScr * (abs(T_air - T_thscr)) ** (0.33)
 
-    def MV_top_covin(VP1, VP2, HEC):
-        return MV_843(VP1, VP2, HEC)
+    def MV_air_thscr(VP_air, VP_mech, U_thrScr, T_air, T_thscr):
+        HEC = HEC_air_thscr(U_thrScr, T_air, T_thscr)
+        return MV_843(VP_air, VP_mech, HEC)
+
+    def HEC_top_covin(T_top, T_covin):
+        return c_HECin * (T_top - T_covin)**(0.33) * self.A_cov / self.A_flr
+
+    def MV_top_covin(VP_air, VP_mech, T_top, T_covin):
+        HEC = HEC_top_covin(T_top, T_covin)
+        return MV_843(VP_air, VP_mech, HEC)
 
     def MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr):
         f_thscr_value = f_thscr(U_thscr, T_air, T_top)
