@@ -1,9 +1,8 @@
 from math import exp
 ##Du lieu lay o Netherland
 
-'''n_heatCO2 = 0.057
+n_heatCO2 = 0.057
 n_heatVap = 4.43 * (10 ** (-8))
-n_roofThr = 0.9
 n_insScr = 1
 n_side = 0
 n_sideThr = -1
@@ -11,8 +10,7 @@ n_pad =-1
 h_elevation = 0 #do cao nha kinh o netherland
 
 ###########
-C_d_Gh = 0.75
-C_w_Gh = 0.09
+
 C_maxBuf = -1
 C_buf = -1
 C_d = -1
@@ -29,7 +27,7 @@ h_blowAir = -1
 
 ###########
 A_flr = 1.4 * (10 ** 4)
-A_roof =-1
+A_roof = 0.1 * A_flr
 A_side = -1
 ###########
 o_fog = 0
@@ -81,8 +79,6 @@ P_blow = -1
 ###########
 landa_flr = 1.7
 
-v_wind = -1
-
 g = 9.81
 
 delta_H = 2.45 * (10 ** 6)
@@ -103,9 +99,6 @@ T_airWinter = 5.7
 T_airSummer = 6.2
 T_outWinter = 5.9
 T_outSummer = 15.2
-T_air = -1
-T_top = -1
-T_air_mean = -1
 
 v_windWinter = 2.4
 v_windSummer = 4.6
@@ -114,66 +107,100 @@ CO2_air = -1
 CO2_top = -1
 
 P_qh = -1
-R_qh = -1'''
+R_qh = -1
 
 ###################
 R = 8.3144598 * 1000 # molar gas constant (J*kmol^-1 * K^-1
 delta_H = 2.45 * (10 ** 6)  #nhiet hoa hoi rieng cua nuoc
-M_air = 28.96               #density of the greenhouse air
+M_air = 28.96               #molar mass of water
 p_air0 = 1.20               #density of the air at sea level
 n_heatVap = 4.43 * (10 ** (-8))
 g = 9.81                    #acceleration of gravity
+r_b = 275                   #boundary layer resistance
+C_d_Gh = 0.75
+C_w_Gh = 0.09
+n_roofThr = 0.9
+
 
 class Solver:
-    def __init__(h_elevation, a_flr, h_air, h_top, P_blow, o_fog):
+    def __init__(h_elevation = 0, A_flr = 1.4 * (10 ** 4), A_roof = 1.4*(10**3), A_side = 0, h_air = 3.8, h_gh = 4.2, P_blow = 0, o_fog = 0, o_pad = 16.7, n_pad = 1, c_leakage = 10**-4,K_thScr, C_d = 0.75, C_w = 0.09, h_sideRoof = 0,h_vent = 0.68, n_insScr = 1, o_ventForce = 0):
         self.h_elevation = h_elevation  #do cao nha kinh so voi muc nuoc bien
-        self.a_flr = a_flr      #dien tich nha kinh
+        self.p_Air = p_Air(self.h_elevation)    #density of the greenhouse air
+        self.p_Top = p_Air(self.h_elevation + self.h_air)   #density of the air in the top room
+        self.A_flr = A_flr      #dien tich nha kinh
+        self.A_roof = A_roof
+        self.A_side = A_side
         self.h_air = h_air      #chieu cao gian duoi
-        self.h_top = h_top      #chieu cao gian tren
+        self.h_top = h_gh - h_air      #chieu cao gian tren
         self.P_blow = P_blow    #kha nang sinh hoi nuoc cua may suoi
         self.o_fog = o_fog      #suc chua he thong phun suong
-        self.p_Air = p_Air()
-        
-        
-        
+        self.o_pad = o_pad      #kha nang cho hoi nuoc di qua cua tam thong gio
+        self.n_pad = n_pad      #hieu suat cua he thong thong gio (trong sach khong co cai nay)
+        #x_out va x_air: khong ro   
+        self.c_leakage = c_leakage  #do ro cua luoi
+        self.K_thScr = K_thScr      #thermal screen flux coefficient
+        self.C_d = C_d
+        self.C_w = C_w
+        self.h_sideRoof = h_sideRoof
+        self.h_vent = h_vent
+        self.n_insScr = n_insScr
+        self.o_ventForce = o_ventForce
         
         
         
 ###################
-    def p_air():
-        return p_air0 * exp(g * M_air * h_elevation /(293.15 * R))
-    def f_pad():
-        return -1
+    def p_air(elevate):
+        return p_air0 * exp(g * M_air * elevate /(293.15 * R))
 
-    def f_leakage(c_leakage, v_wind):
+    def f_leakage(v_wind):
         if (v_wind < 0.25):
-            return 0.25 * c_leakage
+            return 0.25 * self.c_leakage
         else:
-            return c_leakage * v_wind
+            return self.c_leakage * v_wind
 
-    def f_thscr(U_thscr, K_thscr, T_air, T_top, P_airMean, p_Air, p_Top):
-        return U_thscr * K_thscr * abs(T_air - T_top) ** (2 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * P_airMean) * (p_Air - p_Top)) ** (1 / 2)
+    def f_thscr(U_thscr, T_air, T_top):
+        return U_thscr * self.K_thscr * abs(T_air - T_top) ** (2 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * (self.p_Air + self.p_Top)/2) * (p_Air - p_Top)) ** (1 / 2)
 
-    def f_VentRoofSide(C_d, C_w, A_flr, U_roof, U_side, A_roof, A_side, h_sideRoof, T_air, T_out, T_air_Mean ,v_wind):
+    def f_VentRoofSide(U_roof, U_side, T_air, T_out, v_wind):
         temp = (U_roof * U_side * A_roof * A_side) / ((U_roof ** 2) * (A_roof ** 2) + (U_side ** 2) * (A_side ** 2))
-        temp2 = 2 * g * h_sideRoof * (T_air - T_out) / T_air_Mean
+        temp2 = 2 * g * h_sideRoof * (T_air - T_out) / ((T_air + T_out)/2.0)
         temp3 = (((U_roof * A_roof + U_side * A_side) / 2) ** (1 /2)) * C_w * (v_wind ** 2)
         return C_d / A_flr * ((temp * temp2 + temp3) ** (1 / 2))
+    
+    #f_VentRoofSide khi A_roof = 0 --> f''_ventSide
+    def f_VentSide_base(U_roof, U_side, T_air, T_out, v_wind):
+        temp = (U_roof * U_side * 0 * A_side) / ((U_roof ** 2) * (0 ** 2) + (U_side ** 2) * (A_side ** 2))
+        temp2 = 2 * g * h_sideRoof * (T_air - T_out) / ((T_air + T_out)/2.0)
+        temp3 = (((U_roof * 0 + U_side * A_side) / 2) ** (1 /2)) * C_w * (v_wind ** 2)
+        return C_d / A_flr * ((temp * temp2 + temp3) ** (1 / 2))
 
-    def f_VentRoof(U_roof, A_roof, C_d, A_flr, h_vent, T_out, T_air, T_tb, C_w, v_wind):
-        temp0 = U_roof * A_roof * C_d / 2 / A_flr
-        temp1 = g * h_vent / 2 * (T_air - T_out) / (T_tb + 273.15) + C_w * (v_wind ** 2)
+    #f''_ventRoof
+    def f_VentRoof_base(U_roof, T_air, T_out, v_wind):
+        temp0 = U_roof * A_roof * C_d / 2.0 / A_flr
+        temp1 = g * h_vent / 2 * (T_air - T_out) / (((T_air + T_out)/2.0) + 273.15) + C_w * (v_wind ** 2)
         return temp0 * (temp1 ** (1 / 2))
-
-    def f_VentSide(n_roof, n_roofThr, n_insScr, ff_ventSide, f_leakage, U_thrScr, n_side):
+        
+    def f_VentRoof(U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_roof):
+        ff_ventRoof = f_VentRoof_base(U_roof, T_out, T_air, v_wind)
+        ff_ventRoofSide = f_VentRoofSide(U_roof, U_side, T_air, T_out, v_wind)
+        _f_leakage = f_leakage(v_wind)
         if (n_roof >= n_roofThr):
-            return n_insScr * ff_ventSide + 0.5  * f_leakage
+            return n_insScr * ff_ventRoof + 0.5  * _f_leakage
         else:
-            return n_insScr * (U_thrScr * ff_ventSide) + (1 - U_thrScr) * ff_ventSide * n_side + 0.5 * f_leakage
+            return n_insScr * (U_thrScr * ff_ventRoof) + (1 - U_thrScr) * ff_ventRoofSide * n_roof + 0.5 * _f_leakage      
 
-    def f_VentForced(n_roof):
-        if (n_roof > n_roofThr):
-            return n_insScr
+    def f_VentSide(U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_side):
+        _f_leakage = f_leakage(v_wind)
+        ff_ventSide = f_VentSide_base(U_roof, U_side, T_air, T_out, v_wind)
+        ff_ventRoofSide = f_VentRoofSide(U_roof, U_side, T_air, T_out, v_wind)
+        if (n_side >= n_roofThr):
+            return n_insScr * ff_ventSide + 0.5  * _f_leakage
+        else:
+            return n_insScr * (U_thrScr * ff_ventSide) + (1 - U_thrScr) * ff_ventRoofSide * n_side + 0.5 * _f_leakage
+
+    def f_VentForced(U_ventForce):
+        return self.n_insScr * U_ventForce * self.o_ventForce / self.A_flr
+        
 
     def MV_843(VP1, VP2, HEC):
         if (VP1 < VP2):
@@ -184,10 +211,10 @@ class Solver:
     def MV_845(VP1, T1, VP2, T2, f):
         return M_water * R * f * (VP1 / (T1 + 273.15) - VP2 / (T2 + 273.15))
 
-    def cap_VP_air(h_air, T_air):
+    def cap_VP_air(T_air):
         return (M_water * h_air)/(R * T_air + 273.15)
     
-    def cap_VP_top(h_top, T_top):
+    def cap_VP_top(T_top):
         return (M_water * h_air)/(R * T_air + 273.15)
 
     def MV_can_air(VP_can, VP_air, pAir, LAI, rb, rs):
@@ -218,12 +245,16 @@ class Solver:
     def MV_top_covin(VP1, VP2, HEC):
         return MV_843(VP1, VP2, HEC)
 
-    def MV_air_top(VP1, T1, VP2, T2):
-        return MV_845(VP1, T1, VP2, T2, f_thscr)
+    def MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr):
+        f_thscr_value = f_thscr(U_thscr, T_air, T_top)
+        return MV_845(VP_air, T_air, VP_top, T_top, f_thscr_value)
 
-    def MV_air_out(VP1, T1, VP2, T2):
-        return MV_845(VP1, T1, VP2, T2, f_VentSide + f_VentForced)
+    def MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce):
+        f_VentSide_value = f_VentSide(U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_side)
+        f_VentForced_value = f_VentForced(U_ventForce)
+        return MV_845(VP_air, T_air, VP_out, T_out, f_VentSide_value + f_VentForced_value)
 
-    def MV_top_out(VP1, T1, VP2, T2):
-        return MV_845(VP1, T1, VP2, T2, f_VentRoof)
+    def MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof):
+        f_VentRoof_value = f_VentRoof(U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_roof)
+        return MV_845(VP_air, T_air, VP_out, T_out, f_VentRoof_value)
 
