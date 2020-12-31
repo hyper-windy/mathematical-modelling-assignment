@@ -276,16 +276,22 @@ class Solver:
         f_VentRoof_value = self.f_VentRoof(U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_roof)
         return self.MV_845(VP_air, T_air, VP_out, T_out, f_VentRoof_value)
 
-    def dx(self, MV):
-        MV_top_out_value = self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof)
-        MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce)
-        MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
-        MV_top_covin(VP_air, VP_mech, T_top, T_covin)
-        MV_air_thscr(VP_air, VP_mech, U_thrScr, T_air, T_thscr)
-        MV_air_mech(VP_air, VP_mech, U_mechcool, T_air, T_mechcool)
-        MV_airout_pad(U_pad, phi_pad, A_flr, VP_air, T_air)
-        MV_blow_air(n_heatVap, U_blow, P_blow, A_flr)
-        MV_fog_air(U_fog, o_fog, A_flr)
-        MV_pad_air(p_air, U_pad, phi_pad, A_flr, n_pad, x_pad, x_out)
-        MV_can_air(VP_can, VP_air, pAir, LAI, rb)
 
+    def dx(self, ):
+        MV_top_out_value = self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof)
+        MV_air_out_value = self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce)
+        MV_air_top_value = self.MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
+        MV_top_covin_value = self.MV_top_covin(VP_air, VP_mech, T_top, T_covin)
+        MV_air_thscr_value = self.MV_air_thscr(VP_air, VP_mech, U_thrScr, T_air, T_thscr)
+        MV_air_mech_value = self.MV_air_mech(VP_air, VP_mech, U_mechcool, T_air, T_mechcool)
+        MV_airout_pad_value = self.MV_airout_pad(U_pad, phi_pad, A_flr, VP_air, T_air)
+        MV_blow_air_value = self.MV_blow_air(n_heatVap, U_blow, P_blow, A_flr)
+        MV_fog_air_value = self.MV_fog_air(U_fog, o_fog, A_flr)
+        MV_pad_air_value = self.MV_pad_air(p_air, U_pad, phi_pad, A_flr, n_pad, x_pad, x_out)
+        MV_can_air_value = self.MV_can_air(VP_can, VP_air, pAir, LAI, rb)
+        cap_VP_top_value = self.cap_VP_top(T_top)
+        cap_VP_air_value = self.cap_VP_air(T_air)
+
+        out1 = (MV_can_air_value + MV_blow_air_value + MV_fog_air_value +  MV_pad_air_value - MV_air_thscr_value - MV_air_top_value - MV_air_out_value - MV_air_mech_value - MV_airout_pad_value) / cap_VP_air_value
+        out2 = (MV_air_top_value - MV_top_covin_value - MV_top_out_value) / cap_VP_top_value
+        return out1, out2
