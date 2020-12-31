@@ -66,7 +66,7 @@ M_ch2o = 30
 c_leakage = 10**-4
 c_pFlr = 0.88 * (10 ** 3)
 c_pThr = 1.8 * (10 ** 3)
-c_pAir = -1
+c_pAir = 10**3
 
 ###########
 y = 65.8
@@ -123,6 +123,7 @@ n_roofThr = 0.9
 c_HECin = 1.86
 COP_mechcool = 0
 P_mechcool = 0
+
 
 class Solver:
     def __init__(h_elevation = 0, A_flr = 1.4 * (10 ** 4), A_roof = 1.4*(10**3), A_side = 0, A_cov = 1.8 * (10 ** 4), h_air = 3.8, h_gh = 4.2, P_blow = 0, o_fog = 0, o_pad = 16.7, n_pad = 1, c_leakage = 10**-4,K_thScr = 0.05 * (10 ** -3), C_d = 0.75, C_w = 0.09, h_sideRoof = 0,h_vent = 0.68, n_insScr = 1, o_ventForce = 0):
@@ -220,12 +221,12 @@ class Solver:
     def cap_VP_top(T_top):
         return (M_water * h_air)/(R * T_air + 273.15)
 
-    def MV_can_air(VP_can, VP_air, pAir, LAI, rb, rs):
-        VEC = VEC_canAir(pAir, LAI, rb,rs)
+    def MV_can_air(VP_can, VP_air, pAir, LAI, rb):
+        VEC = VEC_canAir(pAir, LAI, rb, rs_min)
         return VEC * (VP_can - VP_air)
     
-    def VEC_canAir(pAir, LAI, rb, rs, psy_const, c_p_Air):
-        return (2 * pAir * c_p_Air * LAI) / (delta_H * psy_const * (rb + rs))
+    def VEC_canAir(pAir, LAI, rb, rs):
+        return (2 * pAir * c_pAir * LAI) / (delta_H * psy_const * (rb + rs))
     
     def MV_pad_air(p_air, U_pad, phi_pad, A_flr, n_pad, x_pad, x_out):
         return p_air * (U_pad * phi_pad) / A_flr * (n_pad * (x_pad - x_out) + x_out)
@@ -274,4 +275,6 @@ class Solver:
     def MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof):
         f_VentRoof_value = f_VentRoof(U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_roof)
         return MV_845(VP_air, T_air, VP_out, T_out, f_VentRoof_value)
+
+    
 
