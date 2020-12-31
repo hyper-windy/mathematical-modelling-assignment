@@ -30,16 +30,31 @@ def euler(dx, x0, y, h, x ):
         x0 = x0 + h
   
     return y
+   
+def cal_saturation_pressure(t):
+    return 610.78 * exp( t / ( t + 238.3 ) * 17.2694)
     
+def cal_VP(rhAir, t):
+    return rhAir * cal_saturation_pressure(t) / 100.0
+      
 data = []
 with open("Greenhouse_climate.csv", "r") as f:
     csv_file = csv.DictReader(f)
     for row in csv_file:
         data.append(row)
-co2_air = data[0]["CO2air"]
-co2_top = co2_air
-co2_air_data = data[0]["CO2air"]
-print(co2_air)
+VP_air = cal_VP(float(data[0]["RHair"]), float(data[0]["Tair"]))
+VP_top = VP_air
+VP_air_compare = VP_air
+VP_out = VP_air
 solver = Solver()
 for i in range(24):
-    
+    Vp_air_compare = cal_VP(float(data[i]["RHair"]), float(data[i]["Tair"]))
+    T_air = float(data[i]["Tair"])
+    T_out = T_air + 1
+    T_thscr = T_air + 1
+    T_top = T_air
+    U_roof = (float(data[i]["VentLee"]) + float(data[i]["Ventwind"])) / 2 / 100
+    U_thscr = float(data[i]["EnScr"]) / 100
+    #(Vp_air, VP_top) = rk4()
+    d = solver.dx(VP_air = VP_air, T_air = T_air, VP_out = VP_out , T_out = T_out, T_top = T_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr)
+    print(d)

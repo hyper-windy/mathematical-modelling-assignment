@@ -129,12 +129,12 @@ class Solver:
     def __init__(self, h_elevation = 0, A_flr = 1.4 * (10 ** 4), A_roof = 1.4*(10**3), A_side = 0, A_cov = 1.8 * (10 ** 4), h_air = 3.8, h_gh = 4.2, P_blow = 0, o_fog = 0, o_pad = 16.7, n_pad = 1, c_leakage = 10**-4,K_thScr = 0.05 * (10 ** -3), C_d = 0.75, C_w = 0.09, h_sideRoof = 0,h_vent = 0.68, n_insScr = 1, o_ventForce = 0):
         self.h_elevation = h_elevation  #do cao nha kinh so voi muc nuoc bien
         self.p_Air = self.p_air(self.h_elevation)    #density of the greenhouse air
+        self.h_air = h_air      #chieu cao gian duoi
         self.p_Top = self.p_air(self.h_elevation + self.h_air)   #density of the air in the top room
         self.A_flr = A_flr      #dien tich nha kinh
         self.A_roof = A_roof
         self.A_side = A_side
         self.A_cov = A_cov
-        self.h_air = h_air      #chieu cao gian duoi
         self.h_top = h_gh - h_air      #chieu cao gian tren
         self.P_blow = P_blow    #kha nang sinh hoi nuoc cua may suoi
         self.o_fog = o_fog      #suc chua he thong phun suong
@@ -163,20 +163,26 @@ class Solver:
             return self.c_leakage * v_wind
 
     def f_thscr(self, U_thscr, T_air, T_top):
-        return U_thscr * self.K_thscr * abs(T_air - T_top) ** (2 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * (self.p_Air + self.p_Top)/2) * (self.p_Air - self.p_Top)) ** (1 / 2)
+        return U_thscr * self.K_thScr * abs(T_air - T_top) ** (2 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * (self.p_Air + self.p_Top)/2) * (self.p_Air - self.p_Top)) ** (1 / 2)
 
     def f_VentRoofSide(self, U_roof, U_side, T_air, T_out, v_wind):
-        temp = (U_roof * U_side * self.A_roof * self.A_side) / ((U_roof ** 2) * (self.A_roof ** 2) + (U_side ** 2) * (self.A_side ** 2))
-        temp2 = 2 * g * self.h_sideRoof * (T_air - T_out) / ((T_air + T_out)/2.0)
-        temp3 = (((U_roof * self.A_roof + U_side * self.A_side) / 2) ** (1 /2)) * self.C_w * (v_wind ** 2)
-        return self.C_d / self.A_flr * ((temp * temp2 + temp3) ** (1 / 2))
+        try:
+            temp = (U_roof * U_side * self.A_roof * self.A_side) / ((U_roof ** 2) * (self.A_roof ** 2) + (U_side ** 2) * (self.A_side ** 2))
+            temp2 = 2 * g * self.h_sideRoof * (T_air - T_out) / ((T_air + T_out)/2.0)
+            temp3 = (((U_roof * self.A_roof + U_side * self.A_side) / 2) ** (1 /2)) * self.C_w * (v_wind ** 2)
+            return self.C_d / self.A_flr * ((temp * temp2 + temp3) ** (1 / 2))
+        except:
+            return 0
         
     #f_VentRoofSide khi A_roof = 0 --> f''_ventSide
     def f_VentSide_base(self, U_roof, U_side, T_air, T_out, v_wind):
-        temp = (U_roof * U_side * 0 * self.A_side) / ((U_roof ** 2) * (0 ** 2) + (U_side ** 2) * (self.A_side ** 2))
-        temp2 = 2 * g * self.h_sideRoof * (T_air - T_out) / ((T_air + T_out)/2.0)
-        temp3 = (((U_roof * 0 + U_side * self.A_side) / 2) ** (1 /2)) * self.C_w * (v_wind ** 2)
-        return self.C_d / self.A_flr * ((temp * temp2 + temp3) ** (1 / 2))
+        try:
+            temp = (U_roof * U_side * 0 * self.A_side) / ((U_roof ** 2) * (0 ** 2) + (U_side ** 2) * (self.A_side ** 2))
+            temp2 = 2 * g * self.h_sideRoof * (T_air - T_out) / ((T_air + T_out)/2.0)
+            temp3 = (((U_roof * 0 + U_side * self.A_side) / 2) ** (1 /2)) * self.C_w * (v_wind ** 2)
+            return self.C_d / self.A_flr * ((temp * temp2 + temp3) ** (1 / 2))
+        except:
+            return 0
 
     #f''_ventRoof
     def f_VentRoof_base(self, U_roof, T_air, T_out, v_wind):
@@ -271,14 +277,14 @@ class Solver:
     def MV_air_out(self, VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce):
         f_VentSide_value = self.f_VentSide(U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_side)
         f_VentForced_value = self.f_VentForced(U_ventForce)
-        return self.MV_845(VP_air, self.T_air, VP_out, T_out, f_VentSide_value + f_VentForced_value)
+        return self.MV_845(VP_air, T_air, VP_out, T_out, f_VentSide_value + f_VentForced_value)
 
     def MV_top_out(self, VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof):
         f_VentRoof_value = self.f_VentRoof(U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_roof)
         return self.MV_845(VP_air, T_air, VP_out, T_out, f_VentRoof_value)
 
 
-    def dx(self, VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce, n_roof, VP_mech, T_top, T_covin, VP_top, U_thscr, T_thscr, U_mechcool, T_mechcool, U_pad, U_blow, U_fog, x_pad, x_out, LAI, rb, VP_can):
+    def dx(self, VP_air, T_air, VP_out, T_out, T_top, U_thrScr = 0, U_roof = 0, U_side = 0, v_wind = 0, n_side = 0, U_ventForce = 0, n_roof = 0, VP_mech = 0, T_covin = 0, VP_top = 0, U_thscr = 0, T_thscr = 0, U_mechcool = 0, T_mechcool = 0, U_pad = 0, U_blow = 0, U_fog = 0, x_pad = 0, x_out = 0, LAI = 0, rb = 0, VP_can = 0):
         MV_top_out_value = self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof)
         MV_air_out_value = self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce)
         MV_air_top_value = self.MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
