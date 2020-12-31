@@ -48,7 +48,7 @@ p_top = -1
 p_air_mean = -1
 ###########
 r_b = 275
-r_sMin = 82
+rs_min = 82
 r_s = -1
 s_r_s = -1
 
@@ -219,14 +219,15 @@ class Solver:
         return (M_water * self.h_air)/(R * T_air + 273.15)
     
     def cap_VP_top(self, T_top):
-        return (M_water * h_air)/(R * T_air + 273.15)
+        return (M_water * h_air)/(R * T_top + 273.15)
+
+    def VEC_canAir(self, LAI, rb, rs):
+        return (2 * self.p_Air * c_pAir * LAI) / (delta_H * y * (rb + rs))
 
     def MV_can_air(self, VP_can, VP_air, LAI, rb):
-        VEC = VEC_canAir(self.p_Air, LAI, rb, rs_min)
-        return VEC * (VP_can - VP_air)
+        VEC = self.VEC_canAir(LAI, rb, rs_min)
+        return VEC * (VP_can - VP_air)   
     
-    def VEC_canAir(self, LAI, rb, rs):
-        return (2 * self.p_Air * c_pAir * LAI) / (delta_H * psy_const * (rb + rs))
     
     def MV_pad_air(self, U_pad, x_pad, x_out):
         return self.p_Air * (U_pad * self.o_pad) / self.A_flr * (self.n_pad * (x_pad - x_out) + x_out)
