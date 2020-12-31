@@ -1,3 +1,4 @@
+from cau5 import *
 import csv
 def rk4(dx, x0, y0, x, h): 
     # Count number of iterations using step size or 
@@ -13,7 +14,6 @@ def rk4(dx, x0, y0, x, h):
   
         # Update next value of y 
         y = y + (1.0 / 6.0)*(k1 + 2 * k2 + 2 * k3 + k4) 
-  
         # Update next value of x 
         x0 = x0 + h 
     return y 
@@ -30,4 +30,16 @@ def euler(dx, x0, y, h, x ):
         x0 = x0 + h
   
     return y
+    
+data = []
+with open("Greenhouse_climate.csv", "r") as f:
+    csv_file = csv.DictReader(f)
+    for row in csv_file:
+        data.append(row)
+co2_air = data[0]["CO2air"]
+co2_top = co2_air
+co2_air_data = data[0]["CO2air"]
+print(co2_air)
+solver = Solver()
+for i in range(24):
     
