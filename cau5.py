@@ -302,3 +302,27 @@ class Solver:
         out1 = (MV_can_air_value + MV_blow_air_value + MV_fog_air_value +  MV_pad_air_value - MV_air_thscr_value - MV_air_top_value - MV_air_out_value - MV_air_mech_value - MV_airout_pad_value) / cap_VP_air_value
         out2 = (MV_air_top_value - MV_top_covin_value - MV_top_out_value) / cap_VP_top_value
         return out1, out2
+        
+'''test = Solver()
+print(test.h_elevation)
+print(test.p_Air)
+print(test.h_air)# = h_air      #chieu cao gian duoi
+print(test.p_Top) #= print(test.p_air(print(test.h_elevation + print(test.h_air)   #density of the air in the top room
+print(test.A_flr) #= A_flr      #dien tich nha kinh
+print(test.A_roof)# = A_roof
+print(test.A_side) #= A_side
+print(test.A_cov) #= A_cov
+print(test.h_top) #= h_gh - h_air      #chieu cao gian tren
+print(test.P_blow) #= P_blow    #kha nang sinh hoi nuoc cua may suoi
+print(test.o_fog) #= o_fog      #suc chua he thong phun suong
+print(test.o_pad)# o_pad      #kha nang cho hoi nuoc di qua cua tam thong gio
+print(test.n_pad) #= n_pad      #hieu suat cua he thong thong gio (trong sach khong co cai nay)
+#x_out va x_air: khong ro   
+print(test.c_leakage) #= c_leakage  #do ro cua luoi
+print(test.K_thScr) #= K_thScr      #thermal screen flux coefficient
+print(test.C_d)# = C_d
+print(test.C_w)# = C_w
+print(test.h_sideRoof) #= h_sideRoof
+print(test.h_vent) #= h_vent
+print(test.n_insScr)# = n_insScr
+print(test.o_ventForce)# = o_ventForce'''
