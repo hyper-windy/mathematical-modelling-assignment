@@ -12,9 +12,9 @@ class Dynamic:
         self.P_Blow = P_Blow
         self.U_ExtCO2 = U_ExtCO2
         self.cap_ExtCO2 = cap_ExtCO2
-        slef.U_pad = U_pad
+        self.U_pad = U_pad
         self.cap_pad = cap_pad
-        slef.CO2_out = CO2_out
+        self.CO2_out = CO2_out
         self.CO2_air = CO2_air
         self.CO2_top = CO2_top
         self.U_ThScr = U_ThScr
