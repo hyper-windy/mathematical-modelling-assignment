@@ -169,7 +169,7 @@ class Solver:
         try:
             temp = (U_roof * U_side * self.A_roof * self.A_side) / ((U_roof ** 2) * (self.A_roof ** 2) + (U_side ** 2) * (self.A_side ** 2))
             temp2 = 2 * g * self.h_sideRoof * (T_air - T_out) / ((T_air + T_out)/2.0)
-            temp3 = (((U_roof * self.A_roof + U_side * self.A_side) / 2) ** (1 /2)) * self.C_w * (v_wind ** 2)
+            temp3 = (((U_roof * self.A_roof + U_side * self.A_side) / 2) ** (1.0 /2)) * self.C_w * (v_wind ** 2)
             return self.C_d / self.A_flr * ((temp * temp2 + temp3) ** (1 / 2))
         except:
             return 0
@@ -179,8 +179,8 @@ class Solver:
         try:
             temp = (U_roof * U_side * 0 * self.A_side) / ((U_roof ** 2) * (0 ** 2) + (U_side ** 2) * (self.A_side ** 2))
             temp2 = 2 * g * self.h_sideRoof * (T_air - T_out) / ((T_air + T_out)/2.0)
-            temp3 = (((U_roof * 0 + U_side * self.A_side) / 2) ** (1 /2)) * self.C_w * (v_wind ** 2)
-            return self.C_d / self.A_flr * ((temp * temp2 + temp3) ** (1 / 2))
+            temp3 = (((U_roof * 0 + U_side * self.A_side) / 2) ** (1.0 /2)) * self.C_w * (v_wind ** 2)
+            return self.C_d / self.A_flr * ((temp * temp2 + temp3) ** (1.0 / 2))
         except:
             return 0
 
@@ -188,7 +188,7 @@ class Solver:
     def f_VentRoof_base(self, U_roof, T_air, T_out, v_wind):
         temp0 = U_roof * self.A_roof * self.C_d / 2.0 / self.A_flr
         temp1 = g * self.h_vent / 2 * (T_air - T_out) / (((T_air + T_out)/2.0) + 273.15) + self.C_w * (v_wind ** 2)
-        return temp0 * (temp1 ** (1 / 2))
+        return temp0 * (temp1 ** (1.0 / 2))
         
     def f_VentRoof(self, U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_roof):
         ff_ventRoof = self.f_VentRoof_base(U_roof, T_out, T_air, v_wind)
