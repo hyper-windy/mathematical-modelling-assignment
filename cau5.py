@@ -222,10 +222,10 @@ class Solver:
         return M_water * R * f * (VP1 / (T1 + 273.15) - VP2 / (T2 + 273.15))
 
     def cap_VP_air(self, T_air):
-        return (M_water * self.h_air)/(R * T_air + 273.15)
+        return (M_water * self.h_air)/(R * (T_air + 273.15))
     
     def cap_VP_top(self, T_top):
-        return (M_water * h_air)/(R * T_top + 273.15)
+        return (M_water * self.h_top)/(R * (T_top + 273.15))
 
     def VEC_canAir(self, LAI, rb, rs):
         return (2 * self.p_Air * c_pAir * LAI) / (delta_H * y * (rb + rs))

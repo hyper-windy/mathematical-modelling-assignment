@@ -62,5 +62,5 @@ U_roof = (float(data[0]["VentLee"]) + float(data[0]["Ventwind"])) / 200.0
 U_thscr = float(data[0]["EnScr"]) / 100
 
 #d = solver.dx(VP_air = VP_air, T_air = T_air, VP_out = VP_out, T_out = T_out, T_top = T_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_top = VP_top, VP_thscr = VP_thscr)[0]
-VP_air = euler(solver.dx, 0, VP_air, 2.5, 5, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr)
+VP_air = euler(solver.dx, 0, VP_air, 5, 5, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr)
 print("%f %f" %(cal_VP(float(data[0]["RHair"]), float(data[0]["Tair"])), VP_air))
