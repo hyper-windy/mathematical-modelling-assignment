@@ -163,7 +163,7 @@ class Solver:
             return self.c_leakage * v_wind
 
     def f_thscr(self, U_thscr, T_air, T_top):
-        return U_thscr * self.K_thScr * abs(T_air - T_top) ** (2 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * (self.p_Air + self.p_Top)/2) * (self.p_Air - self.p_Top)) ** (1 / 2)
+        return U_thscr * self.K_thScr * abs(T_air - T_top) ** (2.0 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * (self.p_Air + self.p_Top)/2) * abs(self.p_Air - self.p_Top)) ** (1.0 / 2)
 
     def f_VentRoofSide(self, U_roof, U_side, T_air, T_out, v_wind):
         try:
@@ -299,20 +299,21 @@ class Solver:
         cap_VP_top_value = self.cap_VP_top(T_top)
         cap_VP_air_value = self.cap_VP_air(T_air)
         
-        #print(MV_top_out_value) # self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof)
-        #print(MV_air_out_value) # self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce)
+        print("BEGIN TEST")
+        print(MV_top_out_value) # self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof)
+        print(MV_air_out_value) # self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce)
         print(MV_air_top_value )# self.MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
-        #print(MV_top_covin_value) # self.MV_top_covin(VP_air, VP_mech, T_top, T_covin)
-        #print(MV_air_thscr_value )# self.MV_air_thscr(VP_air, VP_mech, U_thrScr, T_air, T_thscr)
-        #print(MV_air_mech_value )# self.MV_air_mech(VP_air, VP_mech, U_mechcool, T_air, T_mechcool)
-        #print(MV_airout_pad_value) # self.MV_airout_pad(U_pad, VP_air, T_air)
-        #print(MV_blow_air_value )# self.MV_blow_air(n_heatVap, U_blow)
-        #print(MV_fog_air_value) # self.MV_fog_air(U_fog)
-        #print(MV_pad_air_value) # self.MV_pad_air(U_pad, x_pad, x_out)
-        #print(MV_can_air_value) # self.MV_can_air(VP_can, VP_air, LAI, rb)
-        #print(cap_VP_top_value) # self.cap_VP_top(T_top)
+        print(MV_top_covin_value) # self.MV_top_covin(VP_air, VP_mech, T_top, T_covin)
+        print(MV_air_thscr_value )# self.MV_air_thscr(VP_air, VP_mech, U_thrScr, T_air, T_thscr)
+        print(MV_air_mech_value )# self.MV_air_mech(VP_air, VP_mech, U_mechcool, T_air, T_mechcool)
+        print(MV_airout_pad_value) # self.MV_airout_pad(U_pad, VP_air, T_air)
+        print(MV_blow_air_value )# self.MV_blow_air(n_heatVap, U_blow)
+        print(MV_fog_air_value) # self.MV_fog_air(U_fog)
+        print(MV_pad_air_value) # self.MV_pad_air(U_pad, x_pad, x_out)
+        print(MV_can_air_value) # self.MV_can_air(VP_can, VP_air, LAI, rb)
+        print(cap_VP_top_value) # self.cap_VP_top(T_top)
         print(cap_VP_air_value) # self.cap_VP_air(T_air)
-        #print("END")
+        print("END TEST")
         
         
         

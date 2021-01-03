@@ -18,22 +18,25 @@ def rk4(dx, x0, y0, x, h):
 # Function for euler formula 
 def euler(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr): 
     temp = 0
-    print ("INIT " + str(func_val))
+    print ("INIT VP_air " + str(func_val))
+    print ("INIT VP_top " + str(VP_top))
     while x_init < x_fini: 
         temp = func_val
         (a,b) = dx(VP_air = func_val, T_air = T_air, VP_out = VP_out , T_out = T_out, T_top = T_top, VP_top = VP_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_thscr = VP_thscr)
         func_val = func_val + step * a
-        print("dx " +str(a))
+        print("dx " +str(a) + "\t" + str(b))
         VP_top = VP_top + step*b
         x_init = x_init + step
-        print("END")
+        print("VP_top " + str(VP_top))
+        print("VP_air " + str(func_val))
+        print("END\n")
     return func_val
    
 def cal_saturation_pressure(t):
     return 610.78 * exp( t / ( t + 238.3 ) * 17.2694)
     
 def cal_VP(rhAir, t):
-    return rhAir * cal_saturation_pressure(t) / 100.0 / 9.8
+    return rhAir * cal_saturation_pressure(t) / 100.0
       
 data = []
 with open("Greenhouse_climate.csv", "r") as f:
@@ -55,7 +58,7 @@ T_thscr = T_air + 1             #temperature of the thermal screen
 T_top = T_air                   #temperature in the top room
 VP_top = VP_air
 VP_thscr = cal_saturation_pressure(T_thscr)
-U_roof = (float(data[0]["VentLee"]) + float(data[0]["Ventwind"])) / 200
+U_roof = (float(data[0]["VentLee"]) + float(data[0]["Ventwind"])) / 200.0
 U_thscr = float(data[0]["EnScr"]) / 100
 
 #d = solver.dx(VP_air = VP_air, T_air = T_air, VP_out = VP_out, T_out = T_out, T_top = T_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_top = VP_top, VP_thscr = VP_thscr)[0]
