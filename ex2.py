@@ -2,19 +2,19 @@ R = 8.31446261815324    # J/(K*M)
 g = 9.81
 n_HeatCO2 = 0.057
 c_leakage = 0.0001
-e = 
+e = 2.7182818284
 
 class Dynamic:
 
-    def __init__(self, A_Flr, U_Blow, P_Blow, U_ExtCO2, cap_ExtCO2, U_pad, cap_pad, CO2_out, CO2_air, CO2_top,  U_ThScr, K_ThScr, T_air, T_top, h_roof, h_SideRoof, T_mean_air, p_mean_air, p_air, p_top, Cd, Cw, URoof, USide, ARoof, ASide, c_leakage, S_holes, n_side, n_sideThr, U_VentForced, cap_VentForced, M_cbhd, P):
+    def __init__(self, A_Flr, U_Blow, P_Blow, U_ExtCO2, cap_ExtCO2 = 7.2*10**(-4), U_pad, cap_pad= 0, CO2_out, CO2_air, CO2_top,  U_ThScr, K_ThScr 0.05*10**(-3), T_air, T_top, h_roof, h_SideRoof, T_mean_air, p_mean_air, p_top, Cd, Cw, URoof, USide, ARoof, ASide, c_leakage = 10**(-4), S_holes, n_side, n_sideThr, U_VentForced, cap_VentForced, M_cbhd = 30*10**(-3)):
         self.A_Flr = A_Flr
         self. U_Blow = U_Blow
         self.P_Blow = P_Blow
         self.U_ExtCO2 = U_ExtCO2
         self.cap_ExtCO2 = cap_ExtCO2
-        slef.U_pad = U_pad
+        self.U_pad = U_pad
         self.cap_pad = cap_pad
-        slef.CO2_out = CO2_out
+        self.CO2_out = CO2_out
         self.CO2_air = CO2_air
         self.CO2_top = CO2_top
         self.U_ThScr = U_ThScr
@@ -64,6 +64,7 @@ class Dynamic:
         self.I = I(I0, K, e, LAI, m)
         self.L = L(L0, K, e, LAI, m)
         self.pMaxLT = pMaxLT(P_MLT, PmaxT, self.L, L05)
+        self.p_air =
         
     def MC_blow_air(U_Blow, P_Blow, A_Flr):      # (3) luong CO2 tu may suoi den gian duoi
         return (n_HeatCO2 * U_Blow * P_Blow)/A_Flr
