@@ -163,7 +163,7 @@ class Solver:
             return self.c_leakage * v_wind
 
     def f_thscr(self, U_thscr, T_air, T_top):
-        return U_thscr * self.K_thScr * abs(T_air - T_top) ** (2.0 / 3) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * (self.p_Air + self.p_Top)/2) * abs(self.p_Air - self.p_Top)) ** (1.0 / 2)
+        return U_thscr * self.K_thScr * (abs(T_air - T_top) ** (2.0 / 3)) + (1 - U_thscr) * (g * (1 - U_thscr) / (2 * (self.p_Air + self.p_Top)/2.0) * abs(self.p_Air - self.p_Top)) ** (1.0 / 2)
 
     def f_VentRoofSide(self, U_roof, U_side, T_air, T_out, v_wind):
         try:
@@ -219,7 +219,7 @@ class Solver:
             return (6.4 * (10.0 ** -9)) * HEC * (VP1 - VP2)
  
     def MV_845(self, VP1, T1, VP2, T2, f):
-        return M_water * R * f * (VP1 / (T1 + 273.15) - VP2 / (T2 + 273.15))
+        return M_water * f * (VP1 / (T1 + 273.15) - VP2 / (T2 + 273.15)) / R
 
     def cap_VP_air(self, T_air):
         return (M_water * self.h_air)/(R * (T_air + 273.15))
@@ -271,7 +271,7 @@ class Solver:
 
     def MV_air_top(self, VP_air, T_air, VP_top, T_top, U_thscr):
         f_thscr_value = self.f_thscr(U_thscr, T_air, T_top)
-        #print("f_thscr_value: " + str(f_thscr_value))
+        print("f_thscr_value: " + str(f_thscr_value))
         return self.MV_845(VP_air, T_air, VP_top, T_top, f_thscr_value)
 
     def MV_air_out(self, VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce):
@@ -299,7 +299,7 @@ class Solver:
         cap_VP_top_value = self.cap_VP_top(T_top)
         cap_VP_air_value = self.cap_VP_air(T_air)
         
-        print("BEGIN TEST")
+        '''print("BEGIN TEST")
         print(MV_top_out_value) # self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof)
         print(MV_air_out_value) # self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce)
         print(MV_air_top_value )# self.MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
@@ -313,11 +313,9 @@ class Solver:
         print(MV_can_air_value) # self.MV_can_air(VP_can, VP_air, LAI, rb)
         print(cap_VP_top_value) # self.cap_VP_top(T_top)
         print(cap_VP_air_value) # self.cap_VP_air(T_air)
-        print("END TEST")
+        print("END TEST")'''
         
-        
-        
-
+                     
         out1 = (MV_can_air_value + MV_blow_air_value + MV_fog_air_value +  MV_pad_air_value - MV_air_thscr_value - MV_air_top_value - MV_air_out_value - MV_air_mech_value - MV_airout_pad_value) / cap_VP_air_value
         out2 = (MV_air_top_value - MV_top_covin_value - MV_top_out_value) / cap_VP_top_value
         return out1, out2

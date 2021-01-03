@@ -17,11 +17,9 @@ def rk4(dx, x0, y0, x, h):
 
 # Function for euler formula 
 def euler(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr): 
-    temp = 0
     print ("INIT VP_air " + str(func_val))
     print ("INIT VP_top " + str(VP_top))
     while x_init < x_fini: 
-        temp = func_val
         (a,b) = dx(VP_air = func_val, T_air = T_air, VP_out = VP_out , T_out = T_out, T_top = T_top, VP_top = VP_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_thscr = VP_thscr)
         func_val = func_val + step * a
         print("dx " +str(a) + "\t" + str(b))
@@ -61,6 +59,6 @@ VP_thscr = cal_saturation_pressure(T_thscr)
 U_roof = (float(data[0]["VentLee"]) + float(data[0]["Ventwind"])) / 200.0
 U_thscr = float(data[0]["EnScr"]) / 100
 
-#d = solver.dx(VP_air = VP_air, T_air = T_air, VP_out = VP_out, T_out = T_out, T_top = T_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_top = VP_top, VP_thscr = VP_thscr)[0]
-VP_air = euler(solver.dx, 0, VP_air, 5, 5, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr)
+d = solver.dx(VP_air = VP_air, T_air = T_air, VP_out = VP_out, T_out = T_out, T_top = T_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_top = VP_top, VP_thscr = VP_thscr)[0]
+VP_air = euler(solver.dx, 0, VP_air, 2.5, 5, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr)
 print("%f %f" %(cal_VP(float(data[0]["RHair"]), float(data[0]["Tair"])), VP_air))
