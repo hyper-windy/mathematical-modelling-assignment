@@ -17,17 +17,17 @@ def rk4(dx, x0, y0, x, h):
 
 # Function for euler formula 
 def euler(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr): 
-    print ("INIT VP_air " + str(func_val))
-    print ("INIT VP_top " + str(VP_top))
+    #print ("INIT VP_air " + str(func_val))
+    #print ("INIT VP_top " + str(VP_top))
     while x_init < x_fini: 
         (a,b) = dx(VP_air = func_val, T_air = T_air, VP_out = VP_out , T_out = T_out, T_top = T_top, VP_top = VP_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_thscr = VP_thscr)
         func_val = func_val + step * a
-        print("dx " +str(a) + "\t" + str(b))
+        #print("dx " +str(a) + "\t" + str(b))
         VP_top = VP_top + step*b
         x_init = x_init + step
-        print("VP_top " + str(VP_top))
-        print("VP_air " + str(func_val))
-        print("END\n")
+        #print("VP_top " + str(VP_top))
+        #print("VP_air " + str(func_val))
+        #print("END\n")
     return func_val
    
 def cal_saturation_pressure(t):
@@ -50,15 +50,16 @@ solver = Solver()
 Vp_air_compare = cal_VP(float(data[0]["RHair"]), float(data[0]["Tair"]))    #extract VP_air value from the dataset
 #print(VP_air_compare)
 
-T_air = float(data[0]["Tair"])  #air temperature
-T_out = T_air + 1               #temperature of the air outside
-T_thscr = T_air + 1             #temperature of the thermal screen
-T_top = T_air                   #temperature in the top room
-VP_top = VP_air
-VP_thscr = cal_saturation_pressure(T_thscr)
-U_roof = (float(data[0]["VentLee"]) + float(data[0]["Ventwind"])) / 200.0
-U_thscr = float(data[0]["EnScr"]) / 100
+for i in range(24):
+    T_air = float(data[i]["Tair"])  #air temperature
+    T_out = T_air + 1               #temperature of the air outside
+    T_thscr = T_air + 1             #temperature of the thermal screen
+    T_top = T_air                   #temperature in the top room
+    VP_top = VP_air
+    VP_thscr = cal_saturation_pressure(T_thscr)
+    U_roof = (float(data[0]["VentLee"]) + float(data[0]["Ventwind"])) / 200.0
+    U_thscr = float(data[0]["EnScr"]) / 100
 
-d = solver.dx(VP_air = VP_air, T_air = T_air, VP_out = VP_out, T_out = T_out, T_top = T_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_top = VP_top, VP_thscr = VP_thscr)[0]
-VP_air = euler(solver.dx, 0, VP_air, 2.5, 5, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr)
-print("%f %f" %(cal_VP(float(data[0]["RHair"]), float(data[0]["Tair"])), VP_air))
+    d = solver.dx(VP_air = VP_air, T_air = T_air, VP_out = VP_out, T_out = T_out, T_top = T_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_top = VP_top, VP_thscr = VP_thscr)[0]
+    VP_air = euler(solver.dx, 0, VP_air, 0.1, 5, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr)
+    print("%f %f" %(cal_VP(float(data[1]["RHair"]), float(data[0]["Tair"])), VP_air))
