@@ -7,7 +7,7 @@ p_air0 = 1.20               #density of the air at sea level
 
 class Dynamic:
 
-    def __init__(self, U_Blow, U_ExtCO2, U_pad, U_ThScr, U_VentForced, URoof, USide, CO2_out, CO2_air, CO2_top, T_air, T_top, T0, Ha, Hd, S, Res, CO2_05, n_side, n_roof, n_sideThr, n_roofThr, A_Flr = 1.4*10**4, P_Blow, cap_ExtCO2 = 7.2*10**(-4), cap_pad = 0, K_ThScr = 0.05*10**(-3), h_roof = 0.68, h_SideRoof, T_mean_air, p_mean_air, p_top, Cd = 0.75, Cw = 0.09, ARoof = 1.4*10**3, ASide = 0, c_leakage = 10**(-4), S_holes = 1, cap_VentForced = x, M_cbhd = 30*10**(-3), K = , m = 0.1):
+    def __init__(self, U_Blow, U_ExtCO2, U_pad, U_ThScr, U_VentForced, URoof, USide, CO2_out, CO2_air, CO2_top, T_air, T_top, T0, Ha, Hd, S, Res, CO2_05, n_side, n_roof, n_sideThr, n_roofThr, A_Flr = 1.4*10**4, P_Blow, cap_ExtCO2 = 7.2*10**(-4), cap_pad = 0, K_ThScr = 0.05*10**(-3), h_roof = 0.68, h_SideRoof, T_mean_air, p_mean_air, p_top, Cd, Cw, ARoof = 1.4*10**3, ASide = 0, c_leakage = 10**(-4), S_holes = 1, cap_VentForced = x, M_cbhd = 30*10**(-3), K = , m = 0.1):
         self. U_Blow = U_Blow
         self.U_ExtCO2 = U_ExtCO2
         self.U_ThScr = U_ThScr
@@ -89,7 +89,7 @@ class Dynamic:
         self.P = P(PMax, Res, CO2_air, CO2_05)
     
     def p_air():
-        
+
         
     def MC_blow_air(U_Blow, P_Blow, A_Flr):      # (3) luong CO2 tu may suoi den gian duoi
         return (n_HeatCO2 * U_Blow * P_Blow)/A_Flr
@@ -189,11 +189,9 @@ class Dynamic:
         #(3)-(7), (9)-(19), (22), (25), (28), (24), (27) và (29)
     
     def dx(cap_CO2air, cap_CO2top, MC_blow_air, MC_ext_air, MC_pad_air, MC_air_can, MC_air_top, MC_air_out):
-        a = []
-        a.append((MC_blow_air + MC_ext_air + MC_pad_air - MC_air_can - MC_air_top - MC_air_out)/cap_CO2air)
-        a.append((MC_air_top - MC_top_out)/cap_CO2top)
-        return a
-
+        vCO2_air = (MC_blow_air + MC_ext_air + MC_pad_air - MC_air_can - MC_air_top - MC_air_out)/cap_CO2air
+        vCO2_top = (MC_air_top - MC_top_out)/cap_CO2top
+        return (vCO2_air, vCO2_top)
 
 def main():
     x = 0
