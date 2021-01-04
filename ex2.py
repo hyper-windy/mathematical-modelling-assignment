@@ -7,7 +7,7 @@ p_air0 = 1.20               #density of the air at sea level
 
 class Dynamic:
 
-    def __init__(self, U_Blow, U_ExtCO2, U_pad, U_ThScr, U_VentForced, URoof, USide, CO2_out, CO2_air, CO2_top, T_air, T_top, T0, Ha, Hd, S, Res, CO2_05, n_side, n_roof, n_sideThr, n_roofThr, A_Flr = 1.4*10**4, P_Blow, cap_ExtCO2 = 7.2*10**(-4), cap_pad = 0, K_ThScr = 0.05*10**(-3), h_roof = 0.68, h_SideRoof, T_mean_air, p_mean_air, p_top, Cd, Cw, ARoof = 1.4*10**3, ASide = 0, c_leakage = 10**(-4), S_holes = 1, cap_VentForced = x, M_cbhd = 30*10**(-3), K = , m = 0.1):
+    def __init__(self, U_Blow, U_ExtCO2, U_pad, U_ThScr, U_VentForced, URoof, USide, CO2_out, CO2_air, CO2_top, T_air, T_top, T0, Ha, Hd, S, Res, CO2_05, n_side, n_roof, n_sideThr, n_roofThr, A_Flr = 1.4*10**4, P_Blow, cap_ExtCO2 = 7.2*10**(-4), cap_pad = 0, K_ThScr = 0.05*10**(-3), h_roof = 0.68, h_SideRoof, T_mean_air, p_mean_air, p_top, Cd = 0.75, Cw = 0.09, ARoof = 1.4*10**3, ASide = 0, c_leakage = 10**(-4), S_holes = 1, cap_VentForced = x, M_cbhd = 30*10**(-3), K = , m = 0.1):
         self. U_Blow = U_Blow
         self.U_ExtCO2 = U_ExtCO2
         self.U_ThScr = U_ThScr
