@@ -3,43 +3,64 @@ g = 9.81
 n_HeatCO2 = 0.057
 c_leakage = 0.0001
 e = 2.7182818284
+p_air0 = 1.20               #density of the air at sea level
 
 class Dynamic:
 
-    def __init__(self, A_Flr, U_Blow, P_Blow, U_ExtCO2, cap_ExtCO2 = 7.2*10**(-4), U_pad, cap_pad= 0, CO2_out, CO2_air, CO2_top,  U_ThScr, K_ThScr 0.05*10**(-3), T_air, T_top, h_roof, h_SideRoof, T_mean_air, p_mean_air, p_top, Cd, Cw, URoof, USide, ARoof, ASide, c_leakage = 10**(-4), S_holes, n_side, n_sideThr, U_VentForced, cap_VentForced, M_cbhd = 30*10**(-3)):
-        self.A_Flr = A_Flr
+    def __init__(self, U_Blow, U_ExtCO2, U_pad, U_ThScr, U_VentForced, URoof, USide, CO2_out, CO2_air, CO2_top, T_air, T_top, T0, Ha, Hd, S, Res, CO2_05, n_side, n_roof, n_sideThr, n_roofThr, A_Flr = 1.4*10**4, P_Blow, cap_ExtCO2 = 7.2*10**(-4), cap_pad = 0, K_ThScr = 0.05*10**(-3), h_roof = 0.68, h_SideRoof, T_mean_air, p_mean_air, p_top, Cd, Cw, ARoof = 1.4*10**3, ASide = 0, c_leakage = 10**(-4), S_holes = 1, cap_VentForced = x, M_cbhd = 30*10**(-3), K = , m = 0.1):
         self. U_Blow = U_Blow
-        self.P_Blow = P_Blow
         self.U_ExtCO2 = U_ExtCO2
-        self.cap_ExtCO2 = cap_ExtCO2
+        self.U_ThScr = U_ThScr
         self.U_pad = U_pad
+        self.U_VentForced = U_VentForced
+        self.USide = USide
+        self.URoof = URoof
+
+        self.A_Flr = A_Flr
+        self.P_Blow = P_Blow  
+        self.cap_ExtCO2 = cap_ExtCO2
         self.cap_pad = cap_pad
+
         self.CO2_out = CO2_out
         self.CO2_air = CO2_air
         self.CO2_top = CO2_top
-        self.U_ThScr = U_ThScr
+        self.CO2_05 = CO2_05
+        
         self.K_ThScr = K_ThScr
+        self.K = K
+        self.n_side = n_side
+        self.n_roof = n_roof
+        self.n_sideThr = n_sideThr
+        self.n_roofThr = n_roofThr
+        self.p_air =
+        self.p_top =
+        self.p_out =
+
         self.T_air = T_air
         self.T_top = T_top
+        self.T0 = k_T0
+        self.Ha = Ha
+        self.Hd = Hd
+        self.Res = Res
+
         self.h_roof = h_roof
         self.h_SideRoof = h_SideRoof
         self.T_mean_air = T_mean_air
         self.p_mean_air = p_mean_air
-        self.p_air = p_air
+        self.p_air = 
         self.p_top = p_top
         self.Cd = Cd
         self.Cw = Cw
-        self.URoof = URoof
-        self.USide = USide
+        
         self.ARoof = ARoof
         self.ASide = ASide
         self.c_leakage = c_leakage
         self.S_holes = s_holes
         self.n_side = n_side
-        self.n_sideThr = n_sideThr
-        self.U_VentForced = U_VentForced
+        self.n_sideThr = n_sideThr     
         self.cap_VentForced = cap_VentForced
         self.M_cbhd = M_cbhd
+
         self.MC_blow_air = MC_blow_air(U_Blow, n_HeatCO2, P_Blow, A_Flr)
         self.MC_ext_air = MC_ext_air(U_ExtCO2, cap_ExtCO2, A_Flr)
         self.f_leakage = f_leakage(v_wind, c_leakage)
@@ -55,16 +76,20 @@ class Dynamic:
         self.f_VentRoofSide = f_VentRoofSide(Cd, A_Flr, URoof, ARoof, USide, ASide, g, h_SideRoof, T_air, T_out, T_mean_air, Cw, v_wind)
         self.fff_VentRoof = fff_VentRoof(n_roof, n_roofThr, Cd, A_Flr, URoof, ARoof, USide, ASide, h_SideRoof, T_air, T_out, T_mean_air, Cw, v_wind)
         self.hCBuf = hCBuf(CBuf, C_Max_Buf)
-        self.P = P(PMax, Res, CO2_air, CO2_05)
         self.MC_air_can = MC_air_can(M_cbhd, self.hCBuf, self.P, R)
-        self.k = k(LAI, k_T0, e, Ha, R, T, T0)
+        self.k = k(k_T0, e, Ha, R, T, T0)
+        self.k_ex = k_ex(LAI, k_T0, e, Ha, R, T, T0)
         self.k_T0 = 
-        self.f = f()
+        self.P_MLT = 
+        self.f = f(self.T, self.T0, self.Hd, self.S)
         self.PMaxT = PmaxT(self.k, self.f)
         self.I = I(I0, K, e, LAI, m)
         self.L = L(L0, K, e, LAI, m)
         self.pMaxLT = pMaxLT(P_MLT, PmaxT, self.L, L05)
-        self.p_air =
+        self.P = P(PMax, Res, CO2_air, CO2_05)
+    
+    def p_air():
+        
         
     def MC_blow_air(U_Blow, P_Blow, A_Flr):      # (3) luong CO2 tu may suoi den gian duoi
         return (n_HeatCO2 * U_Blow * P_Blow)/A_Flr
@@ -107,7 +132,7 @@ class Dynamic:
         if n_side >= n_sideThr:
             return n_InsScr*fff_VentSide + 0.5*f_leakage
         else:
-            return n_InsScr*(U_ThScr*fff_VentSide + (1 - U_ThScr)*fVentRoofSide*n_side) + 0.5*f_leakage
+            return n_InsScr*(U_ThScr*fff_VentSide + (1 - U_ThScr)*f_VentRoofSide*n_side) + 0.5*f_leakage
     
     def f_VentForced(n_InsScr, U_VentForced, cap_VentForced, A_Flr):      # (14) toc do gio tu he thong quat ben trong nha kinh
         return (n_InsScr * U_VentForced * cap_VentForced)/A_Flr
@@ -115,14 +140,14 @@ class Dynamic:
     def MC_top_out(f_VentRoof, CO2_top, CO2_out):       # (15) luong khi di tu gian tren ra ngoai
         return f_VentRoof*(CO2_top - CO2_out)
     
-    def f_VentRoof(n_roof, n_roofThr, n_side, n_InsScr, fff_VentRoof, f_leakage):        #(16) toc do luong khong khi di qua o mo mai nha kinh
-        if n_roof >= n_roofThr:
+    def f_VentRoof(n_InsScr, fff_VentRoof, f_leakage):        #(16) toc do luong khong khi di qua o mo mai nha kinh
+        if self.n_roof >= self.n_roofThr:
             return (n_InsScr*fff_VentRoof + 0.5*f_leakage)
         else:
-            return (n_InsScr*(U_ThScr*fff_VentRoof + (1 - U_ThScr)*f_VentRoofSide*n_side) + 0.5*f_leakage)   
+            return (n_InsScr*(U_ThScr*fff_VentRoof + (1 - U_ThScr)*f_VentRoofSide*self.n_side) + 0.5*f_leakage)   
 
-    def fff_VentRoof(n_roof, n_roofThr, Cd, A_Flr, URoof, ARoof, USide, ASide, h_SideRoof, T_air, T_out, T_mean_air, Cw, v_wind):      #(17)
-        if n_roof > n_roofThr:
+    def fff_VentRoof(Cd, A_Flr, URoof, ARoof, USide, ASide, h_SideRoof, T_air, T_out, T_mean_air, Cw, v_wind):      #(17)
+        if self.n_roof > self.n_roofThr:
             return (Cd*URoof*ARoof/(2*A_Flr)*sqrt(g*h_roof*(T_air - T_out)/(2*T_mean_air) +Cw*pow(v_wind, 2)))
         else: 
             return f_VentRoofSide(Cd, A_Flr, URoof, ARoof, USide, 0, h_SideRoof, T_air, T_out, T_mean_air, Cw, v_wind)
@@ -131,9 +156,9 @@ class Dynamic:
         return M_cbhd*hCBuf*(P-R)
     
     def hCBuf(CBuf, C_Max_Buf):            # (19) he so the hien su ngung qua trinh quang hop
-        if CBuf > C_Max_Buf:
+        '''if CBuf > C_Max_Buf:
             return 0
-        else:
+        else:'''                            # gia dinh Cbuf luon be hon CbufMax
             return 1
     
     def P(PMax, Res, CO2_air, CO2_05):               # (22)
@@ -148,13 +173,19 @@ class Dynamic:
     def L(L0, K, e, LAI, m):                #(27) nang luong tan la nhan duoc
         return L0*(1 - (K*power(e, -(K.LAI)))/(1-m))
     
-    def k(LAI, k_T0, e, Ha, R, T, T0):                #(28) toc do phan ung cho toan bo la cay (reaction rate)
+    def k_ex(LAI, k_T0, e, Ha, R, T, T0):                #(28) toc do phan ung cho toan bo la cay (reaction rate)
         return LAI * k_T0 * pow(e, -(Ha/R)*(1/T - 1/T0))
+
+    def k(k_T0, e, Ha, R, T, T0):                #(23) toc do phan ung cho toan bo la cay (reaction rate)
+        return k_T0 * pow(e, -(Ha/R)*(1/T - 1/T0))    
     
     def L05():
     
     def pMaxLT(P_MLT, PmaxT, L, L05):           #(29) toc do quang hop toi da
         return (P_MLT * PmaxT * L)/(L + L05)
+
+    def f(T, T0, Hd, S):             
+        return (1 + pow(e, (-Hd/R)(1/T0 - S/Hd))) / ((1 + pow(e, (-Hd/R)(1/T - S/Hd)))
         #(3)-(7), (9)-(19), (22), (25), (28), (24), (27) và (29)
     
     def dx(cap_CO2air, cap_CO2top, MC_blow_air, MC_ext_air, MC_pad_air, MC_air_can, MC_air_top, MC_air_out):
@@ -162,6 +193,7 @@ class Dynamic:
         a.append((MC_blow_air + MC_ext_air + MC_pad_air - MC_air_can - MC_air_top - MC_air_out)/cap_CO2air)
         a.append((MC_air_top - MC_top_out)/cap_CO2top)
         return a
+
 
 def main():
     x = 0
@@ -175,9 +207,7 @@ def main():
 
     cap_ExtCO2 = 7.2*10**4
     cap_pad = x
-    S_holes = 1
-    A_Flr = 1.4*(10**4)
-    CO2_out
+    CO2_out 
     CO2_air
     CO2_top
     K_ThScr
@@ -190,10 +220,10 @@ def main():
     Cd
     Cw
 
-    c_leakage
-    v_wind
-    n_Side_Thr
-    n_side
+    c_leakage = 10**(-4)
+    v_wind =
+    n_Side_Thr =
+    n_side =
 
     obj = Dynamic()
 
