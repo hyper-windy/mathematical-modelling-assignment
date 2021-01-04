@@ -10,11 +10,6 @@ n_pad =-1
 h_elevation = 0 #do cao nha kinh o netherland
 
 ###########
-
-C_maxBuf = -1
-C_buf = -1
-C_d = -1
-C_w = -1
 ###########
 h_roof = 0
 h_sideRoof = 0
