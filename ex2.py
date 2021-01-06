@@ -194,42 +194,8 @@ class Dynamic:
     def f(T, T0, Hd, S):             
         return (1 + pow(e, (-Hd/R)(1/T0 - S/Hd))) / ((1 + pow(e, (-Hd/R)(1/T - S/Hd)))
         #(3)-(7), (9)-(19), (22), (25), (28), (24), (27) và (29)
-    
+
     def dx(cap_CO2air, cap_CO2top, MC_blow_air, MC_ext_air, MC_pad_air, MC_air_can, MC_air_top, MC_air_out):
         vCO2_air = (MC_blow_air + MC_ext_air + MC_pad_air - MC_air_can - MC_air_top - MC_air_out)/cap_CO2air
         vCO2_top = (MC_air_top - MC_top_out)/cap_CO2top
         return (vCO2_air, vCO2_top)
-
-def main():
-    x = 0
-    U_Blow = 0
-    U_ThScr = 0
-    U_pad = 0
-    U_VentForced = 0
-    U_ExtCO2 = 0
-
-    P_Blow = x
-
-    cap_ExtCO2 = 7.2*10**4
-    cap_pad = x
-    CO2_out 
-    CO2_air
-    CO2_top
-    K_ThScr
-    p_Mean_Air
-    T_air
-    T_top
-    p_Air0
-    p_air
-    p_top
-    Cd
-    Cw
-
-    c_leakage = 10**(-4)
-    v_wind =
-    n_Side_Thr =
-    n_side =
-
-    obj = Dynamic()
-
-main()

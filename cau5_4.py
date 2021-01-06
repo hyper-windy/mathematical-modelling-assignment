@@ -64,7 +64,7 @@ for i in range(15):
     U_roof = (float(data[i]["VentLee"]) + float(data[i]["Ventwind"])) / 2 / 100.0
     U_thscr = float(data[i]["EnScr"]) / 100
     # d = solver.dx(VP_air = VP_air, T_air = T_air, VP_out = VP_out, T_out = T_out, T_top = T_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_top = VP_top, VP_thscr = VP_thscr)[0]
-    (VP_air, VP_top) = rk4(solver.dx, 10, VP_air, 2.5, 15, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof,
+    (VP_air, VP_top) = rk4(solver.dx, 0, VP_air, 2.5, 5, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof,
                              U_thscr, VP_thscr)
     print("Current VP: %f\t\tNext VP:%f\t RK4: %f" % (cal_VP(float(data[i]["RHair"]), float(data[i]["Tair"])),
                                                         cal_VP(float(data[i + 1]["RHair"]), float(data[i + 1]["Tair"])),
