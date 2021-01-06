@@ -4,17 +4,17 @@ import csv
 
 def rk4(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr):
     while x_init < x_fini:
-        (k1_air, k1_top) = step * dx(VP_air=func_val, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
-                                     VP_top=VP_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr, VP_thscr=VP_thscr)
-        (k2_air, k2_top) = step * dx(VP_air=func_val + 0.5 * k1_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
+        (k1_air, k1_top) = (step * k1 for k1 in dx(VP_air=func_val, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
+                                     VP_top=VP_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr, VP_thscr=VP_thscr))
+        (k2_air, k2_top) = (step * k2 for k2 in dx(VP_air=func_val + 0.5 * k1_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
                                   VP_top=VP_top + 0.5 * k1_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr,
-                                  VP_thscr=VP_thscr)
-        (k3_air, k3_top) = step * dx(VP_air=func_val + 0.5 * k2_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
+                                  VP_thscr=VP_thscr))
+        (k3_air, k3_top) = (step * k3 for k3 in dx(VP_air=func_val + 0.5 * k2_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
                                   VP_top=VP_top + 0.5 * k2_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr,
-                                  VP_thscr=VP_thscr)
-        (k4_air, k4_top) = step * dx(VP_air=func_val + 0.5 * k3_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
+                                  VP_thscr=VP_thscr))
+        (k4_air, k4_top) = (step * k4 for k4 in dx(VP_air=func_val + 0.5 * k3_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
                                   VP_top=VP_top + 0.5 * k3_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr,
-                                  VP_thscr=VP_thscr)
+                                  VP_thscr=VP_thscr))
         func_val = func_val + (1.0 / 6.0) * (k1_air + 2 * k2_air + 2 * k3_air + k4_air)
         VP_top += (1.0 / 6.0) * (k1_top + 2 * k2_top + 2 * k3_top + k4_top)
         x_init += step
