@@ -7,6 +7,7 @@ n_insScr = 1
 n_side = 0
 n_sideThr = -1
 n_pad =-1
+n_roofThr = 0.9
 h_elevation = 0 #do cao nha kinh o netherland
 
 ###########
@@ -114,7 +115,6 @@ g = 9.81                    #acceleration of gravity
 r_b = 275                   #boundary layer resistance
 C_d_Gh = 0.75
 C_w_Gh = 0.09
-n_roofThr = 0.9
 c_HECin = 1.86
 COP_mechcool = 0
 P_mechcool = 0
@@ -144,7 +144,8 @@ class Solver:
         self.h_vent = h_vent
         self.n_insScr = n_insScr
         self.o_ventForce = o_ventForce
-        
+        self.n_roof = n_roofThr
+        self.n_side = n_roofThr
         
         
 ###################
@@ -189,7 +190,7 @@ class Solver:
         ff_ventRoof = self.f_VentRoof_base(U_roof, T_out, T_air, v_wind)
         ff_ventRoofSide = self.f_VentRoofSide(U_roof, U_side, T_air, T_out, v_wind)
         _f_leakage = self.f_leakage(v_wind)
-        if (n_roof >= n_roofThr):
+        if (self.n_roof >= n_roofThr):
             return self.n_insScr * ff_ventRoof + 0.5  * _f_leakage
         else:
             return self.n_insScr * (U_thrScr * ff_ventRoof) + (1 - U_thrScr) * ff_ventRoofSide * n_roof + 0.5 * _f_leakage      
@@ -198,8 +199,8 @@ class Solver:
         _f_leakage = self.f_leakage(v_wind)
         ff_ventSide = self.f_VentSide_base(U_roof, U_side, T_air, T_out, v_wind)
         ff_ventRoofSide = self.f_VentRoofSide(U_roof, U_side, T_air, T_out, v_wind)
-        if (n_side >= n_roofThr):
-            return self.n_insScr * ff_ventSide + 0.5  * _f_leakage
+        if (self.n_side >= n_roofThr):
+            return self.n_insScr * ff_ventSide + 0.5 * _f_leakage
         else:
             return self.n_insScr * (U_thrScr * ff_ventSide) + (1 - U_thrScr) * ff_ventRoofSide * n_side + 0.5 * _f_leakage
 
