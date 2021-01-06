@@ -5,8 +5,10 @@ M_air = 28.96               #molar mass of water
 g = 9.81
 n_HeatCO2 = 0.057
 n_roofThr = 0.9
+n_sideThr = n_roofThr
+c_leakage = 10**(-4)
 class Dynamic:
-    def __init__(self, h_elevation = 0, h_air = 3.8, h_gh = 4.2,U_Blow = 0, P_Blow = 0, A_Flr = 1.4*10**4, U_ExtCO2 =0, cap_ExtCO2 = 72000, U_pad = 0, cap_pad = 0, U_ThScr = 0, K_ThScr = 0.05*(10**(-3)), C_d = 0.75, C_w = 0.09, URoof = 0, USide = 0, ASide = 0, h_SideRoof = 0, S_holes = 1, n_roof = n_roofThr):
+    def __init__(self, h_elevation = 0, h_air = 3.8, h_gh = 4.2,U_Blow = 0, P_Blow = 0, A_Flr = 1.4*10**4, U_ExtCO2 =0, cap_ExtCO2 = 72000, U_pad = 0, cap_pad = 0, U_ThScr = 0, K_ThScr = 0.05*(10**(-3)), C_d = 0.75, C_w = 0.09, URoof = 0, USide = 0, ASide = 0, h_SideRoof = 0, S_holes = 1, n_roof = n_roofThr, U_VentForced = 0, cap_VentForced = 0):
         self.h_elevation = h_elevation  # do cao nha kinh so voi muc nuoc bien
         self.p_Air = self.p_air(self.h_elevation)  # density of the greenhouse air
         self.h_air = h_air  # chieu cao gian duoi
@@ -31,6 +33,8 @@ class Dynamic:
         self.S_holes = S_holes
         self.n_roof = n_roof
         self.n_side = n_roof
+        self.U_VentForced = U_VentForced
+        self.cap_VentForced = cap_VentForced
 
     def p_air(self, elevate):
         return p_air0 * exp(g * M_air * elevate / (293.15 * R))
@@ -60,10 +64,11 @@ class Dynamic:
         temp2 = (1 - self.U_Thscr) * sqrt((g * (1 - self.U_Thscr) * abs(self.p_Air - self.p_Top) / (2 * p_mean_air)))
         return temp1 + temp2
 
-    def MC_air_out(self, CO2_air, CO2_out, f_VentSide, f_VentForced):
+    def MC_air_out(self, CO2_air, CO2_out, T_air, T_out, v_wind):
         # (9) luong CO2 di tu gian duoi ra ben ngoai
-        f_VentSide_value =
-        return (f_VentSide + f_VentForced)*(CO2_air - CO2_out)
+        f_VentSide_value = self.f_VentSide(T_air, T_out, v_wind)
+        f_VentForced_value = self.f_VentForced()
+        return (f_VentSide_value + f_VentForced_value)*(CO2_air - CO2_out)
 
 
     def f_VentRoofSide(self, T_air, T_out, v_wind):
@@ -89,15 +94,57 @@ class Dynamic:
     def redutionfactor(self):   #(11)
         return self.S_holes*(2 - self.S_holes)
 
+    def f_leakage(self,v_wind):    #(12) wind speed, coefficient of leakage
+        if v_wind < 0.25:
+            return 0.25*c_leakage
+        else:
+            return v_wind*c_leakage
+
+    def f_VentSide(self,T_air, T_out, v_wind):  # (13) toc do gio cua he thong quat tren tuong bao xung quanh nha kinh
+        n_InsScr = self.redutionfactor()
+        f_leakage_value = self.f_leakage(v_wind)
+        fff_VentSide_value = self.fff_VentSide(T_air, T_out, v_wind)
+        f_VentRoofSide_value = self.f_VentRoofSide(T_air,T_out,v_wind)
+        if self.n_side >= n_sideThr:
+            return n_InsScr * fff_VentSide_value + 0.5 * f_leakage_value
+        else:
+            return n_InsScr * (self.U_Thscr * fff_VentSide_value + (1 - self.U_Thscr) * f_VentRoofSide_value * self.n_side) + 0.5 * f_leakage_value
+
+    def f_VentForced(self):  # (14) toc do gio tu he thong quat ben trong nha kinh
+        n_InsScr = self.redutionfactor()
+        return (n_InsScr * self.U_VentForced * self.cap_VentForced) / self.A_Flr
+
+    def MC_top_out(self, CO2_top, CO2_out,T_air, T_out, v_wind):  # (15) luong khi di tu gian tren ra ngoai
+        f_VentRoof_value = self.f_VentRoof(T_air, T_out, v_wind)
+        return f_VentRoof_value * (CO2_top - CO2_out)
+
     # f''_ventRoof
     def fff_VentRoof(self, T_air, T_out, v_wind):
         temp0 = self.URoof * self.ARoof * self.C_d / 2.0 / self.A_Flr
         temp1 = g * self.h / 2 * (T_air - T_out) / (((T_air + T_out) / 2.0) + 273.15) + self.C_w * (v_wind ** 2)
         return temp0 * (temp1 ** (1.0 / 2))
 
-    def f_VentRoof(self, n_InsScr, fff_VentRoof, f_leakage):        #(16) toc do luong khong khi di qua o mo mai nha kinh
+    def f_VentRoof(self, T_air, T_out, v_wind):        #(16) toc do luong khong khi di qua o mo mai nha kinh
+        n_InsScr = self.redutionfactor()
+        fff_VentRoof_value = self.fff_VentRoof(T_air, T_out, v_wind)
+        f_leakage_value = self.f_leakage(v_wind)
+        f_VentRoofSide_value = self.f_VentRoofSide(T_air, T_out, v_wind)
         if self.n_roof >= n_roofThr:
-            return (n_InsScr*fff_VentRoof + 0.5*f_leakage)
+            return (n_InsScr * fff_VentRoof_value + 0.5*f_leakage_value)
         else:
-            return (n_InsScr*(self.U_Thscr*fff_VentRoof + (1 - U_ThScr)*f_VentRoofSide* self.n_side) + 0.5*f_leakage)
+            return (n_InsScr*(self.U_Thscr*fff_VentRoof_value + (1 - self.U_Thscr)*f_VentRoofSide_value* self.n_side) + 0.5*f_leakage_value)
 
+    def dx(self, CO2_out, CO2_air, CO2_top, T_air, T_top, T_out, v_wind):
+        MC_blow_air_value = self.MC_blow_air()
+        MC_ext_air_value = self.MC_ext_air()
+        MC_pad_air_value = self.MC_pad_air(CO2_out, CO2_air)
+        #MC_air_can_value
+        MC_air_top_value = self.MC_air_top(CO2_air,CO2_out,T_air, T_top)
+        MC_air_out_value = self.MC_air_out(CO2_air,CO2_out, T_air, T_out, v_wind)
+        MC_top_out_value = self.MC_top_out(CO2_top, CO2_out, T_air, T_out, v_wind)
+        cap_CO2air = self.h_air
+        cap_CO2top = self.h_top
+
+        vCO2_air = (MC_blow_air_value + MC_ext_air_value + MC_pad_air_value - MC_air_can - MC_air_top_value - MC_air_out_value)/cap_CO2air
+        vCO2_top = (MC_air_top_value - MC_top_out_value)/cap_CO2top
+        return vCO2_air, vCO2_top
