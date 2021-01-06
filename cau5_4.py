@@ -54,7 +54,7 @@ Vp_air_compare = cal_VP(float(data[0]["RHair"]), float(data[0]["Tair"]))  # extr
 # print(VP_air_compare)
 VP_top = VP_air
 
-for i in range(1):
+for i in range(15):
     T_air = float(data[i]["Tair"])  # air temperature
     T_out = T_air + 1  # temperature of the air outside
     T_thscr = T_air + 1  # temperature of the thermal screen
