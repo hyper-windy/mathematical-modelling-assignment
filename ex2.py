@@ -1,3 +1,4 @@
+import
 R = 8.31446261815324    # J/(K*M)
 g = 9.81
 n_HeatCO2 = 0.057
@@ -10,6 +11,7 @@ class Dynamic:
     def __init__(self, U_Blow, U_ExtCO2, U_pad, U_ThScr, U_VentForced, URoof, USide, P_Blow, CO2_out, CO2_air, CO2_top, T_air, T_top, T0, Ha, Hd, S, Res, CO2_05, n_side, n_roof, n_sideThr, n_roofThr, A_Flr = 1.4*10**4, cap_ExtCO2 = 7.2*10**(-4), cap_pad = 0, K_ThScr = 0.05*10**(-3), h_roof = 0.68, h_SideRoof, T_mean_air, p_mean_air, p_top, Cd, Cw, ARoof = 1.4*10**3, ASide = 0, c_leakage = 10**(-4), S_holes = 1, cap_VentForced = x, M_cbhd = 30*10**(-3), K = , m = 0.1):
         self. U_Blow = U_Blow
         self.U_ExtCO2 = U_ExtCO2
+
         self.U_ThScr = U_ThScr
         self.U_pad = U_pad
         self.U_VentForced = U_VentForced
@@ -76,8 +78,8 @@ class Dynamic:
         self.MC_air_out = MC_air_out(CO2_air, CO2_out, self.f_VentSide, self.f_VentForced)
         self.f_VentRoofSide = f_VentRoofSide(Cd, A_Flr, URoof, ARoof, USide, ASide, g, h_SideRoof, T_air, T_out, T_mean_air, Cw, v_wind)
         self.fff_VentRoof = fff_VentRoof(n_roof, n_roofThr, Cd, A_Flr, URoof, ARoof, USide, ASide, h_SideRoof, T_air, T_out, T_mean_air, Cw, v_wind)
-        self.hCBuf = hCBuf(CBuf, C_Max_Buf)
-        self.MC_air_can = MC_air_can(M_cbhd, self.hCBuf, self.P, R)
+        self.hCBuf = self.hCBuf(CBuf, C_Max_Buf)
+        self.MC_air_can = self.MC_air_can(M_cbhd, self.hCBuf, self.P, R)
         self.k = k(k_T0, e, Ha, R, T, T0)
         self.k_ex = k_ex(LAI, k_T0, e, Ha, R, T, T0)
         self.k_T0 = 
