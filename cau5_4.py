@@ -97,11 +97,11 @@ for i in range(start, end):
 
     U_roof = (float(climate[i]["VentLee"]) + float(climate[i]["Ventwind"])) / 2 / 100.0
     U_thscr = float(climate[i]["EnScr"]) / 100
-    (VP_air_euler, VP_top_euler) = euler(solver.dx, 0, VP_air_euler, 0.1, 5, T_air, VP_out_euler, T_out, T_top, VP_top_euler, T_thscr, U_roof,
+    (VP_air_euler, VP_top_euler) = euler(solver.dx, 0, VP_air_euler, 2.5, 5, T_air, VP_out_euler, T_out, T_top, VP_top_euler, T_thscr, U_roof,
                              U_thscr, VP_thscr)
-    (VP_air_rk4, VP_top_rk4) = rk4(solver.dx, 0, VP_air_rk4, 0.1, 5, T_air, VP_out_rk4, T_out, T_top, VP_top_rk4,
-                             T_thscr, U_roof,
-                             U_thscr, VP_thscr)
+    #(VP_air_rk4, VP_top_rk4) = rk4(solver.dx, 0, VP_air_rk4, 0.1, 5, T_air, VP_out_rk4, T_out, T_top, VP_top_rk4,
+    #                         T_thscr, U_roof,
+    #                         U_thscr, VP_thscr)
 
     #print("Next VP: %f\t\tEuler:%f\t RK4: %f" % (cal_VP(float(climate[i + 1]["RHair"]), float(climate[i + 1]["Tair"])),
     #                                                   VP_air_euler, VP_air_rk4))
@@ -111,5 +111,5 @@ plt.plot(timeline, expectedData, label = "Expected")
 plt.plot(timeline, eulerData, label = "Euler")
 plt.plot(timeline, rk4Data, label = "RK4")
 plt.legend()
-plt.show()
+#plt.show()
 
