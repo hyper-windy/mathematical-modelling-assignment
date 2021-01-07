@@ -1,5 +1,4 @@
 from math import exp
-import matplotlib.pyplot as plt
 ##Du lieu lay o Netherland
 
 n_heatCO2 = 0.057

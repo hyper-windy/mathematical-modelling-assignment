@@ -1,5 +1,7 @@
 from cau5 import *
 import csv
+import matplotlib.pyplot as plt
+
 
 
 def rk4(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr):
@@ -39,6 +41,11 @@ def cal_saturation_pressure(t):
 def cal_VP(rhAir, t):
     return rhAir * cal_saturation_pressure(t) / 100.0
 
+def toMin(timestamp):
+    return round((timestamp * 24 * 3600) % 3600/ 60)
+
+def calEndRow(timeLen, startRow):
+    return startRow + timeLen // 5 + 1
 
 climate = []
 with open("data\\Greenhouse_climate.csv", "r") as f:
@@ -60,23 +67,49 @@ while startData == "NaN":
 start -= 1
 
 #initialize some values
-VP_air = cal_VP(float(climate[start]["RHair"]), float(climate[start]["Tair"]))
-VP_top = VP_air
+VP_air_euler = cal_VP(float(climate[start]["RHair"]), float(climate[start]["Tair"]))
+VP_top_euler = VP_air_euler
+VP_air_rk4 = VP_air_euler
+VP_top_rk4 = VP_air_rk4
 solver = Solver()
+time = 0        #measure the time
+eulerData = []
+rk4Data = []
+expectedData = []
+timeline = []
 
-for i in range(start, 15):
+timeLength = 5   #perform the prediction in 2 days (time measured in minute)
+end = calEndRow(timeLength, start)  #the last row that we'll use in the dataset
+for i in range(start, end):
+    expectedData.append(cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"])))
+    timeline.append(time)
+    eulerData.append(VP_air_euler)
+    rk4Data.append(VP_air_rk4)
+
     T_air = float(climate[i]["Tair"])  # air temperature
     T_out = T_air + 1  # temperature of the air outside
     T_thscr = T_air + 1  # temperature of the thermal screen
     T_top = T_air  # temperature in the top room
-    VP_out = VP_air
+
+    VP_out_euler = VP_air_euler
+    VP_out_rk4 = VP_air_rk4
     VP_thscr = cal_saturation_pressure(T_thscr)
+
     U_roof = (float(climate[i]["VentLee"]) + float(climate[i]["Ventwind"])) / 2 / 100.0
     U_thscr = float(climate[i]["EnScr"]) / 100
-
-    # d = solver.dx(VP_air = VP_air, T_air = T_air, VP_out = VP_out, T_out = T_out, T_top = T_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_top = VP_top, VP_thscr = VP_thscr)[0]
-    (VP_air, VP_top) = rk4(solver.dx, 0, VP_air, 0.1, 5, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof,
+    (VP_air_euler, VP_top_euler) = euler(solver.dx, 0, VP_air_euler, 0.1, 5, T_air, VP_out_euler, T_out, T_top, VP_top_euler, T_thscr, U_roof,
                              U_thscr, VP_thscr)
-    print("Current VP: %f\t\tNext VP:%f\t RK4: %f" % (cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"])),
-                                                        cal_VP(float(climate[i + 1]["RHair"]), float(climate[i + 1]["Tair"])),
-                                                        VP_air))
+    (VP_air_rk4, VP_top_rk4) = rk4(solver.dx, 0, VP_air_rk4, 0.1, 5, T_air, VP_out_rk4, T_out, T_top, VP_top_rk4,
+                             T_thscr, U_roof,
+                             U_thscr, VP_thscr)
+
+    #print("Next VP: %f\t\tEuler:%f\t RK4: %f" % (cal_VP(float(climate[i + 1]["RHair"]), float(climate[i + 1]["Tair"])),
+    #                                                   VP_air_euler, VP_air_rk4))
+    time += 5
+
+plt.plot(timeline, expectedData, label = "Expected")
+plt.plot(timeline, eulerData, label = "Euler")
+plt.plot(timeline, rk4Data, label = "RK4")
+plt.legend()
+plt.show()
+
