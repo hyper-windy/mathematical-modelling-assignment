@@ -186,12 +186,13 @@ class Solver:
         return temp0 * (temp1 ** (1.0 / 2))
         
     def f_VentRoof(self, U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_roof):
-        ff_ventRoof = self.f_VentRoof_base(U_roof, T_out, T_air, v_wind)
         ff_ventRoofSide = self.f_VentRoofSide(U_roof, U_side, T_air, T_out, v_wind)
         _f_leakage = self.f_leakage(v_wind)
         if (self.n_roof >= n_roofThr):
+            ff_ventRoof = self.f_VentSide_base(U_roof,U_side, T_out, T_air, v_wind)
             return self.n_insScr * ff_ventRoof + 0.5  * _f_leakage
         else:
+            ff_ventRoof = self.f_VentRoof_base(U_roof, T_out, T_air, v_wind)
             return self.n_insScr * (U_thrScr * ff_ventRoof) + (1 - U_thrScr) * ff_ventRoofSide * n_roof + 0.5 * _f_leakage      
 
     def f_VentSide(self, U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_side):
