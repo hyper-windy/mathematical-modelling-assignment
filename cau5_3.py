@@ -8,14 +8,21 @@ def cal_VP(rhAir, t):
     return rhAir * cal_saturation_pressure(t) / 100.0
       
 data = []
-with open("Greenhouse_climate.csv", "r") as f:
+with open("data\\Greenhouse_climate.csv", "r") as f:
     csv_file = csv.DictReader(f)
     for row in csv_file:
         data.append(row)
 
 solver = Solver()
+#determine the start of the dataset
+start = 0
+startData = "NaN"
+while startData == "NaN":
+    startData = data[start]["CO2air"]
+    start += 1
+start -= 1
 
-for i in range(300):
+for i in range(start,300):
     VP_air = cal_VP(float(data[i]["RHair"]), float(data[i]["Tair"]))
     T_air = float(data[i]["Tair"])  #air temperature
     T_out = T_air + 1               #temperature of the air outside
