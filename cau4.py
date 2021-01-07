@@ -1,4 +1,4 @@
-import ex2
+import ex2_old
 
 def euler(dx, x0, y0, h, MC_blow_air, MC_ext_air, MC_pad_air, MC_air_can, MC_air_top, MC_air_out):
     k,l = h*dx(x0, y0, MC_blow_air, MC_ext_air, MC_pad_air, MC_air_can, MC_air_top, MC_air_out)
