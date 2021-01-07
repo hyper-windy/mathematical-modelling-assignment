@@ -4,19 +4,19 @@ import matplotlib.pyplot as plt
 
 
 
-def rk4(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr):
+def rk4(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr, VP_can):
     while x_init < x_fini:
         (k1_air, k1_top) = (step * k1 for k1 in dx(VP_air=func_val, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
-                                     VP_top=VP_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr, VP_thscr=VP_thscr))
+                                     VP_top=VP_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr, VP_thscr=VP_thscr, VP_can = VP_can))
         (k2_air, k2_top) = (step * k2 for k2 in dx(VP_air=func_val + 0.5 * k1_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
                                   VP_top=VP_top + 0.5 * k1_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr,
-                                  VP_thscr=VP_thscr))
+                                  VP_thscr=VP_thscr, VP_can = VP_can))
         (k3_air, k3_top) = (step * k3 for k3 in dx(VP_air=func_val + 0.5 * k2_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
                                   VP_top=VP_top + 0.5 * k2_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr,
-                                  VP_thscr=VP_thscr))
+                                  VP_thscr=VP_thscr, VP_can = VP_can))
         (k4_air, k4_top) = (step * k4 for k4 in dx(VP_air=func_val + 0.5 * k3_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
                                   VP_top=VP_top + 0.5 * k3_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr,
-                                  VP_thscr=VP_thscr))
+                                  VP_thscr=VP_thscr, VP_can = VP_can))
         func_val = func_val + (1.0 / 6.0) * (k1_air + 2 * k2_air + 2 * k3_air + k4_air)
         VP_top += (1.0 / 6.0) * (k1_top + 2 * k2_top + 2 * k3_top + k4_top)
         x_init += step
@@ -24,10 +24,12 @@ def rk4(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top,
 
 
 # Function for euler formula
-def euler(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr):
+def euler(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr,VP_can):
     while x_init < x_fini:
         (a, b) = dx(VP_air=func_val, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top, VP_top=VP_top,
-                    T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr, VP_thscr=VP_thscr)
+                    T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr, VP_thscr=VP_thscr, VP_can = VP_can)
+        #print("dx: " + str(a))
+        #print("dx: " + str(b))
         func_val = func_val + step * a
         VP_top += step * b
         x_init += step
@@ -78,7 +80,7 @@ rk4Data = []
 expectedData = []
 timeline = []
 
-timeLength = 5   #perform the prediction in 2 days (time measured in minute)
+timeLength = 60*24*2   #perform the prediction in 2 days (time measured in minute)
 end = calEndRow(timeLength, start)  #the last row that we'll use in the dataset
 for i in range(start, end):
     expectedData.append(cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"])))
@@ -90,18 +92,20 @@ for i in range(start, end):
     T_out = T_air + 1  # temperature of the air outside
     T_thscr = T_air + 1  # temperature of the thermal screen
     T_top = T_air  # temperature in the top room
+    T_can = T_air + 1
 
-    VP_out_euler = VP_air_euler
-    VP_out_rk4 = VP_air_rk4
+    VP_can = cal_saturation_pressure(T_can)
+    VP_out_euler = 1500
+    VP_out_rk4 = 1500   #Van11
     VP_thscr = cal_saturation_pressure(T_thscr)
 
     U_roof = (float(climate[i]["VentLee"]) + float(climate[i]["Ventwind"])) / 2 / 100.0
     U_thscr = float(climate[i]["EnScr"]) / 100
-    (VP_air_euler, VP_top_euler) = euler(solver.dx, 0, VP_air_euler, 2.5, 5, T_air, VP_out_euler, T_out, T_top, VP_top_euler, T_thscr, U_roof,
-                             U_thscr, VP_thscr)
-    #(VP_air_rk4, VP_top_rk4) = rk4(solver.dx, 0, VP_air_rk4, 0.1, 5, T_air, VP_out_rk4, T_out, T_top, VP_top_rk4,
-    #                         T_thscr, U_roof,
-    #                         U_thscr, VP_thscr)
+    (VP_air_euler, VP_top_euler) = euler(solver.dx, 0, VP_air_euler, 0.1, 5, T_air, VP_out_euler, T_out, T_top, VP_top_euler, T_thscr, U_roof,
+                             U_thscr, VP_thscr, VP_can)
+    (VP_air_rk4, VP_top_rk4) = rk4(solver.dx, 0, VP_air_rk4, 0.1, 5, T_air, VP_out_rk4, T_out, T_top, VP_top_rk4,
+                             T_thscr, U_roof,
+                             U_thscr, VP_thscr, VP_can)
 
     #print("Next VP: %f\t\tEuler:%f\t RK4: %f" % (cal_VP(float(climate[i + 1]["RHair"]), float(climate[i + 1]["Tair"])),
     #                                                   VP_air_euler, VP_air_rk4))
@@ -111,5 +115,5 @@ plt.plot(timeline, expectedData, label = "Expected")
 plt.plot(timeline, eulerData, label = "Euler")
 plt.plot(timeline, rk4Data, label = "RK4")
 plt.legend()
-#plt.show()
+plt.show()
 
