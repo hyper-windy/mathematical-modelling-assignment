@@ -40,32 +40,43 @@ def cal_VP(rhAir, t):
     return rhAir * cal_saturation_pressure(t) / 100.0
 
 
-data = []
-with open("Greenhouse_climate.csv", "r") as f:
+climate = []
+with open("data\\Greenhouse_climate.csv", "r") as f:
     csv_file = csv.DictReader(f)
     for row in csv_file:
-        data.append(row)
-VP_air = cal_VP(float(data[0]["RHair"]), float(data[0]["Tair"]))
-VP_top = VP_air
-VP_air_compare = VP_air
-solver = Solver()
-# print(VP_air)
-Vp_air_compare = cal_VP(float(data[0]["RHair"]), float(data[0]["Tair"]))  # extract VP_air value from the dataset
-# print(VP_air_compare)
-VP_top = VP_air
+        climate.append(row)
+vip = []
+with open("data\\vip.csv", "r") as f:
+    csv_file = csv.DictReader(f)
+    for row in csv_file:
+        vip.append(row)
 
-for i in range(15):
-    T_air = float(data[i]["Tair"])  # air temperature
+#determine the start of the dataset
+start = 0
+startData = "NaN"
+while startData == "NaN":
+    startData = climate[start]["CO2air"]
+    start += 1
+start -= 1
+
+#initialize some values
+VP_air = cal_VP(float(climate[start]["RHair"]), float(climate[start]["Tair"]))
+VP_top = VP_air
+solver = Solver()
+
+for i in range(start, 15):
+    T_air = float(climate[i]["Tair"])  # air temperature
     T_out = T_air + 1  # temperature of the air outside
     T_thscr = T_air + 1  # temperature of the thermal screen
     T_top = T_air  # temperature in the top room
     VP_out = VP_air
     VP_thscr = cal_saturation_pressure(T_thscr)
-    U_roof = (float(data[i]["VentLee"]) + float(data[i]["Ventwind"])) / 2 / 100.0
-    U_thscr = float(data[i]["EnScr"]) / 100
+    U_roof = (float(climate[i]["VentLee"]) + float(climate[i]["Ventwind"])) / 2 / 100.0
+    U_thscr = float(climate[i]["EnScr"]) / 100
+
     # d = solver.dx(VP_air = VP_air, T_air = T_air, VP_out = VP_out, T_out = T_out, T_top = T_top, T_thscr = T_thscr, U_roof = U_roof, U_thscr = U_thscr, VP_top = VP_top, VP_thscr = VP_thscr)[0]
-    (VP_air, VP_top) = rk4(solver.dx, 0, VP_air, 2.5, 5, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof,
+    (VP_air, VP_top) = rk4(solver.dx, 0, VP_air, 0.1, 5, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof,
                              U_thscr, VP_thscr)
-    print("Current VP: %f\t\tNext VP:%f\t RK4: %f" % (cal_VP(float(data[i]["RHair"]), float(data[i]["Tair"])),
-                                                        cal_VP(float(data[i + 1]["RHair"]), float(data[i + 1]["Tair"])),
+    print("Current VP: %f\t\tNext VP:%f\t RK4: %f" % (cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"])),
+                                                        cal_VP(float(climate[i + 1]["RHair"]), float(climate[i + 1]["Tair"])),
                                                         VP_air))
