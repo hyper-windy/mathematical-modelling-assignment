@@ -166,7 +166,7 @@ class Solver:
             temp = (U_roof * U_side * self.A_roof * self.A_side) / ((U_roof ** 2) * (self.A_roof ** 2) + (U_side ** 2) * (self.A_side ** 2))
             temp2 = 2 * g * self.h_sideRoof * (T_air - T_out) / ((T_air + T_out)/2.0)
             temp3 = (((U_roof * self.A_roof + U_side * self.A_side) / 2) ** (1.0 /2)) * self.C_w * (v_wind ** 2)
-            return self.C_d / self.A_flr * ((temp * temp2 + temp3) ** (1 / 2))
+            return self.C_d / self.A_flr * ((temp * temp2 + temp3) ** (1.0 / 2))
         except:
             return 0
         
