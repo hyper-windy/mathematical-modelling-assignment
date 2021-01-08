@@ -1,100 +1,36 @@
 from math import exp
 ##Du lieu lay o Netherland
 
+#Lay tu tai lieu [van11]
 n_heatCO2 = 0.057
-n_heatVap = 4.43 * (10 ** (-8))
 n_insScr = 1
 n_roofThr = 0.9
 h_elevation = 0 #do cao nha kinh o netherland
-
-###########
-###########
-h_roof = 0
 h_sideRoof = 0
 h_vent = 0.68
 h_air = 3.8
 h_Gh = 4.2
 h_flr = 0.02
-
-###########
-A_flr = 1.4 * (10 ** 4)
-A_roof = 0.1 * A_flr
-###########
-o_fog = 0
-o_pad = 16.7
-o_ventForce = 0
-o_exitCO2 = 7.2 * (10 ** 4)
-
-###########
-s_insScr = 1
-
-###########
-p_water = 1000
-p_thrScr = 0.2 * (10**3)
-p_flr = 2300
-
-###########
-rb = 275
+rb = 275                   #boundary layer resistance
 rs_min = 82
-
-###########
-e_flr = 1
-e_can = 1
-e_sky = 1
-
-###########
 M_water = 18
-M_air = 28.96
-M_ch2o = 30
-
-###########
-c_leakage = 10**-4
-c_pFlr = 0.88 * (10 ** 3)
-c_pThr = 1.8 * (10 ** 3)
 c_pAir = 10**3
-
-###########
-y = 65.8
+y = 65.8                #psychometric constant
 w = 1.99 * (10 **-7)
-R = 8314
-o = 5.670 * (10 ** -8)
-
-###########
-landa_flr = 1.7
-
-g = 9.81
-
-delta_H = 2.45 * (10 ** 6)
-
-K_thScr = 0.05 * (10 ** -3)
-
-cap_leaf = 1200
-s_MV12 = -0.1
-
-####################
-# Tinh cac gia tri can thiet
-VP_airWinter = 5.7
-VP_outWinter = 0.7
-
-T_airWinter = 5.7
-T_outWinter = 5.9
-
-v_windWinter = 2.4
-
-###################
 R = 8.3144598 * 1000 # molar gas constant (J*kmol^-1 * K^-1
 delta_H = 2.45 * (10 ** 6)  #nhiet hoa hoi rieng cua nuoc
 M_air = 28.96               #molar mass of water
 p_air0 = 1.20               #density of the air at sea level
 n_heatVap = 4.43 * (10 ** (-8))
 g = 9.81                    #acceleration of gravity
-rb = 275                   #boundary layer resistance
+
 C_d_Gh = 0.75
 C_w_Gh = 0.09
 c_HECin = 1.86
 COP_mechcool = 0
 P_mechcool = 0
 LAI = 3
+
 
 class Solver:
     def __init__(self, h_elevation = 0, A_flr = 1.4 * (10 ** 4), A_roof = 1.4*(10**3), A_side = 0, A_cov = 1.8 * (10 ** 4), h_air = 3.8, h_gh = 4.2, P_blow = 0, o_fog = 0, o_pad = 16.7, n_pad = 1, c_leakage = 10**-4,K_thScr = 0.05 * (10 ** -3), C_d = 0.75, C_w = 0.09, h_sideRoof = 0,h_vent = 0.68, n_insScr = 1, o_ventForce = 0):
