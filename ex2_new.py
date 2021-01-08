@@ -7,13 +7,25 @@ n_HeatCO2 = 0.057
 n_roofThr = 0.9
 n_sideThr = n_roofThr
 c_leakage = 10**(-4)
+LAI = 3
+n_co2Air_stom = 0.67
+J_max_leaf = 210
+c_gamma = 1.7
+M_ch2o = 30 * (10 ** -3)    #maybe 30???
+par_can = 100
+alpha = 0.385
+e_curvate_deg = 0.7 #degree of curvature of the electron transport rate
+T_25_k = 298.15 #reference temperature for J_pot
+E_j = 37 * (10**3)  #activation energy for J_pot
+H_j = 22 * (10**4)  #deactivation energy for J_pot
+S_entropy = 710             #entropy term for J_pot
 class Dynamic:
     def __init__(self, h_elevation = 0, h_air = 3.8, h_gh = 4.2,U_Blow = 0, P_Blow = 0, A_Flr = 1.4*10**4, U_ExtCO2 =0, cap_ExtCO2 = 72000, U_pad = 0, cap_pad = 0, U_ThScr = 0, K_ThScr = 0.05*(10**(-3)), C_d = 0.75, C_w = 0.09, URoof = 0, USide = 0, ASide = 0, h_SideRoof = 0, S_holes = 1, n_roof = n_roofThr, U_VentForced = 0, cap_VentForced = 0):
         self.h_elevation = h_elevation  # do cao nha kinh so voi muc nuoc bien
         self.p_Air = self.p_air(self.h_elevation)  # density of the greenhouse air
         self.h_air = h_air  # chieu cao gian duoi
         self.p_Top = self.p_air(self.h_elevation + self.h_air)  # density of the air in the top room
-        self.h_top = self.h_gh - self.h_air
+        self.h_top = h_gh - self.h_air
         self.A_Flr = A_Flr
         self.U_Blow = U_Blow
         self.P_Blow = P_Blow
@@ -134,17 +146,53 @@ class Dynamic:
         else:
             return (n_InsScr*(self.U_Thscr*fff_VentRoof_value + (1 - self.U_Thscr)*f_VentRoofSide_value* self.n_side) + 0.5*f_leakage_value)
 
-    def dx(self, CO2_out, CO2_air, CO2_top, T_air, T_top, T_out, v_wind):
+    def calJpot(self,T_can):
+        J_max_can = LAI * J_max_leaf
+        second = exp(E_j * (T_can + 273.15 - T_25_k)/(8.314*(T_can + 273.15 - T_25_k)))
+        third = (1 + exp((S_entropy * T_25_k - H_j) / (8.314 * T_25_k))) / (1 + exp((S_entropy * (T_can + 273.15) - H_j) / (8.314 * (T_can + 273.15))))
+        return J_max_can * second * third
+
+
+    def electronTrans(self, T_can):
+        J_pot = self.calJpot(T_can)
+        top1 = J_pot + alpha * par_can
+        top2 = ((J_pot + alpha * par_can)**2 - 4*e_curvate_deg * J_pot * alpha * par_can)**(1.0/2.0)
+        bot = 2 * e_curvate_deg
+        return (top1 - top2) / bot
+
+    def co2Stom(self,CO2_air):
+        return n_co2Air_stom * CO2_air
+
+    def gamma(self,T_can):
+        J_max_can = LAI * J_max_leaf
+        return (J_max_leaf / J_max_can)*c_gamma * T_can + 20 * c_gamma * (1 - J_max_leaf/J_max_can)
+
+    def photoRate(self,CO2_air, T_can):
+        J = self.electronTrans(T_can)
+        gamma = self.gamma(T_can)
+        CO2_stom = self.co2Stom(CO2_air)
+        top = J * (CO2_stom - gamma)
+        bot = 4 * (CO2_stom + 2*gamma)
+        return top/bot
+
+
+    def MC_air_can(self, CO2_air, T_can):  # (18) luong CO2 bi hap thu vao trong tan la
+        hCBuf = 1
+        P = self.photoRate(CO2_air, T_can)
+        R = P * (self.gamma(T_can) / self.co2Stom(CO2_air))
+        return M_ch2o * hCBuf * (P - R)
+
+    def dx(self, CO2_out, CO2_air, CO2_top, T_air, T_top, T_out, T_can, v_wind):
         MC_blow_air_value = self.MC_blow_air()
         MC_ext_air_value = self.MC_ext_air()
         MC_pad_air_value = self.MC_pad_air(CO2_out, CO2_air)
-        #MC_air_can_value
+        MC_air_can_value = self.MC_air_can(CO2_air, T_can)
         MC_air_top_value = self.MC_air_top(CO2_air,CO2_out,T_air, T_top)
         MC_air_out_value = self.MC_air_out(CO2_air,CO2_out, T_air, T_out, v_wind)
         MC_top_out_value = self.MC_top_out(CO2_top, CO2_out, T_air, T_out, v_wind)
         cap_CO2air = self.h_air
         cap_CO2top = self.h_top
 
-        vCO2_air = (MC_blow_air_value + MC_ext_air_value + MC_pad_air_value - MC_air_can - MC_air_top_value - MC_air_out_value)/cap_CO2air
+        vCO2_air = (MC_blow_air_value + MC_ext_air_value + MC_pad_air_value - MC_air_can_value - MC_air_top_value - MC_air_out_value)/cap_CO2air
         vCO2_top = (MC_air_top_value - MC_top_out_value)/cap_CO2top
         return vCO2_air, vCO2_top
