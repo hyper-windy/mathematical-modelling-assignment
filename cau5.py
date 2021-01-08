@@ -4,9 +4,6 @@ from math import exp
 n_heatCO2 = 0.057
 n_heatVap = 4.43 * (10 ** (-8))
 n_insScr = 1
-n_side = 0
-n_sideThr = -1
-n_pad =-1
 n_roofThr = 0.9
 h_elevation = 0 #do cao nha kinh o netherland
 
@@ -18,13 +15,10 @@ h_vent = 0.68
 h_air = 3.8
 h_Gh = 4.2
 h_flr = 0.02
-h_Cbuf = -1
-h_blowAir = -1
 
 ###########
 A_flr = 1.4 * (10 ** 4)
 A_roof = 0.1 * A_flr
-A_side = -1
 ###########
 o_fog = 0
 o_pad = 16.7
@@ -38,14 +32,10 @@ s_insScr = 1
 p_water = 1000
 p_thrScr = 0.2 * (10**3)
 p_flr = 2300
-p_air = -1
-p_blow = -1
-p_top = -1
-p_air_mean = -1
+
 ###########
 rb = 275
 rs_min = 82
-s_r_s = -1
 
 ###########
 e_flr = 1
@@ -68,8 +58,6 @@ y = 65.8
 w = 1.99 * (10 **-7)
 R = 8314
 o = 5.670 * (10 ** -8)
-P = -1
-P_blow = -1
 
 ###########
 landa_flr = 1.7
@@ -86,23 +74,12 @@ s_MV12 = -0.1
 ####################
 # Tinh cac gia tri can thiet
 VP_airWinter = 5.7
-VP_airSummer = 6.4
 VP_outWinter = 0.7
-VP_outSummer = 1.5
 
 T_airWinter = 5.7
-T_airSummer = 6.2
 T_outWinter = 5.9
-T_outSummer = 15.2
 
 v_windWinter = 2.4
-v_windSummer = 4.6
-
-CO2_air = -1
-CO2_top = -1
-
-P_qh = -1
-R_qh = -1
 
 ###################
 R = 8.3144598 * 1000 # molar gas constant (J*kmol^-1 * K^-1
@@ -270,7 +247,6 @@ class Solver:
 
     def MV_air_top(self, VP_air, T_air, VP_top, T_top, U_thscr):
         f_thscr_value = self.f_thscr(U_thscr, T_air, T_top)
-        #print("U_thscr: " + str(U_thscr))
         #print("f_thscr_value: " + str(f_thscr_value))
         return self.MV_845(VP_air, T_air, VP_top, T_top, f_thscr_value)
 
@@ -284,9 +260,9 @@ class Solver:
         return self.MV_845(VP_air, T_air, VP_out, T_out, f_VentRoof_value)
 
 
-    def dx(self, VP_air, T_air, VP_out, T_out, T_top, VP_top, VP_thscr, U_thrScr = 0, U_roof = 0, U_side = 0, v_wind = 0, n_side = 0, U_ventForce = 0, n_roof = 0, VP_mech = 0, U_thscr = 0, T_thscr = 0, U_mechcool = 0, T_mechcool = 0, U_pad = 0, U_blow = 0, U_fog = 0, x_pad = 0, x_out = 0, VP_can = 0,T_covin = 15):
-        MV_top_out_value = self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof)
-        MV_air_out_value = self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce)
+    def dx(self, VP_air, T_air, VP_out, T_out, T_top, VP_top, VP_thscr, U_thrScr = 0.01, U_roof = 0.01, U_side = 0.01, v_wind = 0, n_side = 0.09, U_ventForce = 0.01, n_roof = 0.09, VP_mech = 0, T_covin = 0, U_thscr = 0.01, T_thscr = 0, U_mechcool = 0.01, T_mechcool = 0, U_pad = 0.01, U_blow = 0.01, U_fog = 0.01, x_pad = 0, x_out = 0, LAI = 3, rb = 275, VP_can = 0):
+        MV_top_out_value = self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, self.n_roof)
+        MV_air_out_value = self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, self.n_side, U_ventForce)
         MV_air_top_value = self.MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
         MV_top_covin_value = self.MV_top_covin(VP_air, VP_mech, T_top, T_covin)
         MV_air_thscr_value = self.MV_air_thscr(VP_air, VP_thscr, U_thrScr, T_air, T_thscr)
@@ -299,21 +275,24 @@ class Solver:
         cap_VP_top_value = self.cap_VP_top(T_top)
         cap_VP_air_value = self.cap_VP_air(T_air)
         
-        #print("BEGIN TEST")
-        #print(MV_top_out_value) # self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof)
-        #print(MV_air_out_value) # self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce)
-        #print(MV_air_top_value )# self.MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
-        #print(MV_top_covin_value) # self.MV_top_covin(VP_air, VP_mech, T_top, T_covin)
-        #print(MV_air_thscr_value )# self.MV_air_thscr(VP_air, VP_mech, U_thrScr, T_air, T_thscr)
-        #print(MV_air_mech_value )# self.MV_air_mech(VP_air, VP_mech, U_mechcool, T_air, T_mechcool)
-        #print(MV_airout_pad_value) # self.MV_airout_pad(U_pad, VP_air, T_air)
-        #print(MV_blow_air_value )# self.MV_blow_air(n_heatVap, U_blow)
-        #print(MV_fog_air_value) # self.MV_fog_air(U_fog)
-        #print(MV_pad_air_value) # self.MV_pad_air(U_pad, x_pad, x_out)
-        #print(MV_can_air_value) # self.MV_can_air(VP_can, VP_air, LAI, rb)
-        #print(cap_VP_top_value) # self.cap_VP_top(T_top)
-        #print(cap_VP_air_value) # self.cap_VP_air(T_air)
-        #print("END TEST")
+        print("BEGIN TEST")
+        print(MV_top_out_value) # self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof)
+        print(MV_air_out_value) # self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce)
+        print(MV_air_top_value )# self.MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
+        print(MV_top_covin_value) # self.MV_top_covin(VP_air, VP_mech, T_top, T_covin)
+
+        print(MV_air_thscr_value )# self.MV_air_thscr(VP_air, VP_mech, U_thrScr, T_air, T_thscr)
+        print(MV_air_mech_value )# self.MV_air_mech(VP_air, VP_mech, U_mechcool, T_air, T_mechcool)
+        print(MV_airout_pad_value) # self.MV_airout_pad(U_pad, VP_air, T_air)
+
+        print(MV_blow_air_value )# self.MV_blow_air(n_heatVap, U_blow)
+        print(MV_fog_air_value) # self.MV_fog_air(U_fog)
+        print(MV_pad_air_value) # self.MV_pad_air(U_pad, x_pad, x_out)
+        print(MV_can_air_value) # self.MV_can_air(VP_can, VP_air, LAI, rb)
+
+        print(cap_VP_top_value) # self.cap_VP_top(T_top)
+        print(cap_VP_air_value) # self.cap_VP_air(T_air)
+        print("END TEST")
         
                      
         out1 = (MV_can_air_value + MV_blow_air_value + MV_fog_air_value +  MV_pad_air_value - MV_air_thscr_value - MV_air_top_value - MV_air_out_value - MV_air_mech_value - MV_airout_pad_value) / cap_VP_air_value
