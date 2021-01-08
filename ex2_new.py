@@ -20,10 +20,12 @@ E_j = 37 * (10**3)  #activation energy for J_pot
 H_j = 22 * (10**4)  #deactivation energy for J_pot
 S_entropy = 710             #entropy term for J_pot
 class Dynamic:
-    def __init__(self, h_elevation = 0, h_air = 3.8, h_gh = 4.2,U_Blow = 0, P_Blow = 0, A_Flr = 1.4*10**4, U_ExtCO2 =0, cap_ExtCO2 = 72000, U_pad = 0, cap_pad = 0, U_ThScr = 0, K_ThScr = 0.05*(10**(-3)), C_d = 0.75, C_w = 0.09, URoof = 0, USide = 0, ASide = 0, h_SideRoof = 0, S_holes = 1, n_roof = n_roofThr, U_VentForced = 0, cap_VentForced = 0):
+    def __init__(self, h_elevation = 0, h_air = 3.8, h_gh = 4.2, h_vent = 0.68,U_Blow = 0, P_Blow = 0, A_Flr = 1.4*10**4, U_ExtCO2 =0, cap_ExtCO2 = 72000, U_pad = 0, cap_pad = 0, U_ThScr = 0, K_ThScr = 0.05*(10**(-3)), C_d = 0.75, C_w = 0.09, URoof = 0, USide = 0, ASide = 0, h_SideRoof = 0, S_holes = 1, n_roof = n_roofThr, U_VentForced = 0, cap_VentForced = 0):
         self.h_elevation = h_elevation  # do cao nha kinh so voi muc nuoc bien
         self.p_Air = self.p_air(self.h_elevation)  # density of the greenhouse air
         self.h_air = h_air  # chieu cao gian duoi
+        self.h_vent = h_vent
+        self.h_gh = h_gh
         self.p_Top = self.p_air(self.h_elevation + self.h_air)  # density of the air in the top room
         self.h_top = h_gh - self.h_air
         self.A_Flr = A_Flr
@@ -133,7 +135,7 @@ class Dynamic:
             return self.C_d*self.URoof*self.ARoof*v_wind/2/self.A_Flr
         else :
             temp0 = self.URoof * self.ARoof * self.C_d / 2.0 / self.A_Flr
-            temp1 = g * self.h / 2 * (T_air - T_out) / (((T_air + T_out) / 2.0) + 273.15) + self.C_w * (v_wind ** 2)
+            temp1 = g * self.h_vent / 2 * (T_air - T_out) / (((T_air + T_out) / 2.0) + 273.15) + self.C_w * (v_wind ** 2)
             return temp0 * (temp1 ** (1.0 / 2))
 
     def f_VentRoof(self, T_air, T_out, v_wind):        #(16) toc do luong khong khi di qua o mo mai nha kinh
