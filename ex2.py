@@ -133,7 +133,7 @@ class Dynamic:
     def fff_VentRoof(self, T_air, T_out, v_wind):
         if self.n_roof <= n_roofThr:
             return self.C_d*self.URoof*self.ARoof*v_wind/2/self.A_Flr
-        else :
+        else:
             temp0 = self.URoof * self.ARoof * self.C_d / 2.0 / self.A_Flr
             temp1 = g * self.h_vent / 2 * (T_air - T_out) / (((T_air + T_out) / 2.0) + 273.15) + self.C_w * (v_wind ** 2)
             return temp0 * (temp1 ** (1.0 / 2))
