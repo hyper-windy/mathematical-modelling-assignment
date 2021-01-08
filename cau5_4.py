@@ -1,7 +1,6 @@
 from cau5 import *
 import csv
 import matplotlib.pyplot as plt
-from math import sqrt
 
 
 def rk4(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top, T_thscr, U_roof, U_thscr, VP_thscr,
@@ -98,7 +97,6 @@ timeline = []
 
 mse_euler = 0
 mse_rk4 = 0
-VP_mean = 0
 
 timeLength = 60 * 24 * 7  # perform the prediction in 2 days (time measured in minute)
 end = calEndRow(timeLength, start)  # the last row that we'll use in the dataset
@@ -118,7 +116,7 @@ for i in range(start, end):
 
     T_air = float(climate[i]["Tair"])  # air temperature
     T_out = float(meteo[i]["Tout"])  # temperature of the air outside
-    T_thscr = T_air + 1  # temperature of the thermal screen
+    T_thscr = T_air + 1    # temperature of the thermal screen
     T_top = T_air  # temperature in the top room
     T_can = T_air + 1
     T_covin = T_air
@@ -141,7 +139,7 @@ for i in range(start, end):
                                    U_thscr, VP_thscr, VP_can, v_wind, T_covin)
     mse_euler += (VP_air_expected - VP_air_euler) ** 2
     mse_rk4 += (VP_air_expected - VP_air_rk4) ** 2
-    VP_mean += VP_air_expected
+
     writer_euler.writerow({"GHtime": climate[i]["GHtime"],"Current VP_air": cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"])),
                            "Next VP_air": VP_air_expected, "Predicted VP_air": VP_air_euler,
                            "Predicted VP_top": VP_top_euler})
@@ -154,13 +152,8 @@ for i in range(start, end):
 
 mse_euler = mse_euler / (end - start)
 mse_rk4 = mse_rk4 / (end - start)
-VP_mean = VP_mean / (end - start)
-
-rrmse_euler = sqrt(mse_euler) / VP_mean * 100.0
-rrmse_rk4 = sqrt(mse_rk4)/ VP_mean * 100.0
-
-print("RRMSE of Euler method: %f"%(rrmse_euler) + "%")
-print("RRMSE of RK4 method: %f"%(rrmse_rk4) + "%")
+print (mse_euler)
+print (mse_rk4)
 
 plt.plot(timeline, expectedData, label="Expected")
 plt.plot(timeline, eulerData, label="Euler")
