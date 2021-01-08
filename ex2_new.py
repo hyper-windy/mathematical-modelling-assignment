@@ -96,10 +96,7 @@ class Dynamic:
 
     def fff_VentSide(self, T_air, T_out, v_wind):
         try:
-            temp = (self.URoof * self.USide * 0 * self.ASide) / ((self.URoof ** 2) * (0 ** 2) + (self.USide ** 2) * (self.ASide ** 2))
-            temp2 = 2 * g * self.h_SideRoof * (T_air - T_out) / ((T_air + T_out) / 2.0)
-            temp3 = (((self.URoof * 0 + self.USide * self.ASide) / 2) ** (1.0 / 2)) * self.C_w * (v_wind ** 2)
-            return self.C_d / self.A_Flr * ((temp * temp2 + temp3) ** (1.0 / 2))
+            return self.C_d*self.USide*self.ASide*v_wind/2/self.A_Flr
         except:
             return 0
 
@@ -132,9 +129,12 @@ class Dynamic:
 
     # f''_ventRoof
     def fff_VentRoof(self, T_air, T_out, v_wind):
-        temp0 = self.URoof * self.ARoof * self.C_d / 2.0 / self.A_Flr
-        temp1 = g * self.h / 2 * (T_air - T_out) / (((T_air + T_out) / 2.0) + 273.15) + self.C_w * (v_wind ** 2)
-        return temp0 * (temp1 ** (1.0 / 2))
+        if self.n_roof <= n_roofThr:
+            return self.C_d*self.URoof*self.ARoof*v_wind/2/self.A_Flr
+        else :
+            temp0 = self.URoof * self.ARoof * self.C_d / 2.0 / self.A_Flr
+            temp1 = g * self.h / 2 * (T_air - T_out) / (((T_air + T_out) / 2.0) + 273.15) + self.C_w * (v_wind ** 2)
+            return temp0 * (temp1 ** (1.0 / 2))
 
     def f_VentRoof(self, T_air, T_out, v_wind):        #(16) toc do luong khong khi di qua o mo mai nha kinh
         n_InsScr = self.redutionfactor()
