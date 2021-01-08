@@ -260,7 +260,7 @@ class Solver:
         return self.MV_845(VP_air, T_air, VP_out, T_out, f_VentRoof_value)
 
 
-    def dx(self, VP_air, T_air, VP_out, T_out, T_top, VP_top, VP_thscr, U_thrScr = 0.01, U_roof = 0.01, U_side = 0.01, v_wind = 0, n_side = 0.09, U_ventForce = 0.01, n_roof = 0.09, VP_mech = 0, T_covin = 0, U_thscr = 0.01, T_thscr = 0, U_mechcool = 0.01, T_mechcool = 0, U_pad = 0.01, U_blow = 0.01, U_fog = 0.01, x_pad = 0, x_out = 0, LAI = 3, rb = 275, VP_can = 0):
+    def dx(self, VP_air, T_air, VP_out, T_out, T_top, VP_top, VP_thscr, U_thrScr = 0.01, U_roof = 0.01, U_side = 0.01, v_wind = 0, U_ventForce = 0.01, VP_mech = 0, T_covin = 0, U_thscr = 0.01, T_thscr = 0, U_mechcool = 0.01, T_mechcool = 0, U_pad = 0.01, U_blow = 0.01, U_fog = 0.01, x_pad = 0, x_out = 0, VP_can = 0):
         MV_top_out_value = self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, self.n_roof)
         MV_air_out_value = self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, self.n_side, U_ventForce)
         MV_air_top_value = self.MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
@@ -275,7 +275,7 @@ class Solver:
         cap_VP_top_value = self.cap_VP_top(T_top)
         cap_VP_air_value = self.cap_VP_air(T_air)
         
-        print("BEGIN TEST")
+        '''print("BEGIN TEST")
         print(MV_top_out_value) # self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof)
         print(MV_air_out_value) # self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce)
         print(MV_air_top_value )# self.MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
@@ -292,7 +292,7 @@ class Solver:
 
         print(cap_VP_top_value) # self.cap_VP_top(T_top)
         print(cap_VP_air_value) # self.cap_VP_air(T_air)
-        print("END TEST")
+        print("END TEST")'''
         
                      
         out1 = (MV_can_air_value + MV_blow_air_value + MV_fog_air_value +  MV_pad_air_value - MV_air_thscr_value - MV_air_top_value - MV_air_out_value - MV_air_mech_value - MV_airout_pad_value) / cap_VP_air_value
