@@ -86,7 +86,10 @@ rk4Data = []
 expectedData = []
 timeline = []
 
-timeLength = 60*24*2   #perform the prediction in 2 days (time measured in minute)
+mse_euler = 0
+mse_rk4 = 0
+
+timeLength = 60*24*7  #perform the prediction in 2 days (time measured in minute)
 end = calEndRow(timeLength, start)  #the last row that we'll use in the dataset
 for i in range(start, end):
     expectedData.append(cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"])))
@@ -107,15 +110,25 @@ for i in range(start, end):
 
     U_roof = (float(climate[i]["VentLee"]) + float(climate[i]["Ventwind"])) / 2 / 100.0
     U_thscr = float(climate[i]["EnScr"]) / 100
+    #print(str(i) + ": "),
     (VP_air_euler, VP_top_euler) = euler(solver.dx, 0, VP_air_euler, 0.1, 5, T_air, VP_out, T_out, T_top, VP_top_euler, T_thscr, U_roof,
                              U_thscr, VP_thscr, VP_can,v_wind)
+    VP_air_expected = cal_VP(float(climate[i + 1]["RHair"]), float(climate[i + 1]["Tair"]))
+
     (VP_air_rk4, VP_top_rk4) = rk4(solver.dx, 0, VP_air_rk4, 0.1, 5, T_air, VP_out, T_out, T_top, VP_top_rk4,
                              T_thscr, U_roof,
                              U_thscr, VP_thscr, VP_can,v_wind)
-
+    mse_euler += (VP_air_expected - VP_air_euler)**2
+    mse_rk4 += (VP_air_expected - VP_air_rk4)**2
     #print("Next VP: %f\t\tEuler:%f\t RK4: %f" % (cal_VP(float(climate[i + 1]["RHair"]), float(climate[i + 1]["Tair"])),
     #                                                   VP_air_euler, VP_air_rk4))
     time += 5
+
+mse_euler = mse_euler / (end - start)
+mse_rk4 = mse_rk4 / (end - start)
+print (mse_euler)
+print (mse_rk4)
+
 
 plt.plot(timeline, expectedData, label = "Expected")
 plt.plot(timeline, eulerData, label = "Euler")
