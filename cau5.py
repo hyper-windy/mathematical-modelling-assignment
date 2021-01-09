@@ -1,5 +1,6 @@
 from math import exp
-#DU LIEU BEN DUOI LAY O NETHERLAND, TAI LIEU [VAN11]
+
+#CAC GIA TRI BEN DUOI LAY O NETHERLAND, TAI LIEU [VAN11]
 
 n_heatCO2 = 0.057
 n_insScr = 1
@@ -29,33 +30,39 @@ c_HECin = 1.86
 COP_mechcool = 0
 P_mechcool = 0
 LAI = 3
-
+##########
 class Solver:
-    def __init__(self, h_elevation = 0, A_flr = 1.4 * (10 ** 4), A_roof = 1.4*(10**3), A_side = 0, A_cov = 1.8 * (10 ** 4), h_air = 3.8, h_gh = 4.2, P_blow = 0, o_fog = 1, o_pad = 16.7, n_pad = 1, c_leakage = 10**-4,K_thScr = 0.05 * (10 ** -3), C_d = 0.75, C_w = 0.09, h_sideRoof = 2,h_vent = 0.68, n_insScr = 1, o_ventForce = 1):
+    def __init__(self, h_elevation = 0, A_flr = 1.4 * (10 ** 4), A_roof = 1.4*(10**3), A_side = 0, A_cov = 1.8 * (10 ** 4), h_air = 3.8, h_gh = 4.2, P_blow = 1000, o_fog = 1, o_pad = 16.7, n_pad = 1, c_leakage = 10**-4,K_thScr = 0.05 * (10 ** -3), C_d = 0.75, C_w = 0.09, h_sideRoof = 2,h_vent = 0.68, n_insScr = 1, o_ventForce = 1):
+        #lay gia tri tu [van11]
         self.h_elevation = h_elevation  #do cao nha kinh so voi muc nuoc bien
-        self.p_Air = self.p_air(self.h_elevation)    #density of the greenhouse air
         self.h_air = h_air      #chieu cao gian duoi
-        self.p_Top = self.p_air(self.h_elevation + self.h_air)   #density of the air in the top room
         self.A_flr = A_flr      #dien tich nha kinh
-        self.A_roof = A_roof
-        self.A_side = A_side
-        self.A_cov = A_cov
-        self.h_top = h_gh - h_air      #chieu cao gian tren
-        self.P_blow = P_blow    #kha nang sinh hoi nuoc cua may suoi
+        self.A_roof = A_roof    # A_roof = 0.1 * A_flr
+        self.A_cov = A_cov      #lay gia tri tu [van11]
+        self.h_top = h_gh - h_air      #chieu cao gian tren, g_gh lay gia tri tu [van11]
         self.o_fog = o_fog      #suc chua he thong phun suong
         self.o_pad = o_pad      #kha nang cho hoi nuoc di qua cua tam thong gio
-        self.n_pad = n_pad      #hieu suat cua he thong thong gio (trong sach khong co cai nay)
-        #x_out va x_air: khong ro   
         self.c_leakage = c_leakage  #do ro cua luoi
         self.K_thScr = K_thScr      #thermal screen flux coefficient
         self.C_d = C_d
         self.C_w = C_w
-        self.h_sideRoof = h_sideRoof
         self.h_vent = h_vent
-        self.n_insScr = n_insScr
-        self.o_ventForce = o_ventForce
+
+        #Tinh toan bang cong thuc
+        self.p_Air = self.p_air(self.h_elevation)    #density of the greenhouse air        
+        self.p_Top = self.p_air(self.h_elevation + self.h_air)   #density of the air in the top room
+
+        # Gia dinh
+        self.A_side = A_side    
+        self.P_blow = P_blow    #kha nang sinh hoi nuoc cua may suoi
+        self.n_pad = n_pad      #hieu suat cua he thong thong gio (trong sach khong co cai nay)
         self.n_roof = n_roofThr
         self.n_side = n_roofThr
+        self.h_sideRoof = h_sideRoof
+
+        self.n_insScr = n_insScr
+        self.o_ventForce = o_ventForce
+
         
         
 ###################
@@ -191,8 +198,9 @@ class Solver:
         f_VentRoof_value = self.f_VentRoof(U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_roof)
         return self.MV_845(VP_air, T_air, VP_out, T_out, f_VentRoof_value)
 
-
-    def dx(self, VP_air, T_air, VP_out, T_out, T_top, VP_top, VP_thscr, U_thrScr = 0.01, U_roof = 0.01, U_side = 0.01, v_wind = 0, n_side = 0.09, U_ventForce = 0.01, n_roof = 0.09, VP_mech = 0, T_covin = 0, U_thscr = 0.01, T_thscr = 0, U_mechcool = 0.01, T_mechcool = 0, U_pad = 0.01, U_blow = 0.01, U_fog = 0.01, x_pad = 0, x_out = 0, LAI = 3, rb = 275, VP_can = 0):
+    #Cac gia tri tham so dieu khien U duoc gia dinh cho phu hop voi mo hinh neu khong duoc truyen vao
+    #x_out va x_air: khong ro nen gia dinh = 0 
+    def dx(self, VP_air, T_air, VP_out, T_out, T_top, VP_top, VP_thscr, U_thrScr = 1, U_roof = 1, U_side = 0.01, v_wind = 0, n_side = 0.09, U_ventForce = 0.01, n_roof = 0.09, VP_mech = 0, T_covin = 0, U_thscr = 1, T_thscr = 0, U_mechcool = 0.01, T_mechcool = 0, U_pad = 1, U_blow = 0.01, U_fog = 0, x_pad = 0.0, x_out = 0.0, LAI = 3, rb = 275, VP_can = 0):
         MV_top_out_value = self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, self.n_roof)
         MV_air_out_value = self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, self.n_side, U_ventForce)
         MV_air_top_value = self.MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
@@ -205,55 +213,8 @@ class Solver:
         MV_pad_air_value = self.MV_pad_air(U_pad, x_pad, x_out)
         MV_can_air_value = self.MV_can_air(VP_can, VP_air, LAI, rb)
         cap_VP_top_value = self.cap_VP_top(T_top)
-        cap_VP_air_value = self.cap_VP_air(T_air)
-        
-
-        # print("BEGIN TEST")
-        # print(VP_can)
-        # print(VP_air)
-        # print(MV_top_out_value) # self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_roof)
-        # print(MV_air_out_value) # self.MV_air_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, n_side, U_ventForce)
-        # print(MV_air_top_value )# self.MV_air_top(VP_air, T_air, VP_top, T_top, U_thscr)
-        # print(MV_top_covin_value) # self.MV_top_covin(VP_air, VP_mech, T_top, T_covin)
-
-        # print(MV_air_thscr_value )# self.MV_air_thscr(VP_air, VP_mech, U_thrScr, T_air, T_thscr)
-        # print(MV_air_mech_value )# self.MV_air_mech(VP_air, VP_mech, U_mechcool, T_air, T_mechcool)
-        # print(MV_airout_pad_value) # self.MV_airout_pad(U_pad, VP_air, T_air)
-
-        # print(MV_blow_air_value )# self.MV_blow_air(n_heatVap, U_blow)
-        # print(MV_fog_air_value) # self.MV_fog_air(U_fog)
-        # print(MV_pad_air_value) # self.MV_pad_air(U_pad, x_pad, x_out)
-        # print(MV_can_air_value) # self.MV_can_air(VP_can, VP_air, LAI, rb)
-
-        # print(cap_VP_top_value) # self.cap_VP_top(T_top)
-        # print(cap_VP_air_value) # self.cap_VP_air(T_air)
-        # print("END TEST") MV_can_air_value 5*10**-7
-        
+        cap_VP_air_value = self.cap_VP_air(T_air) 
                      
         out1 = (MV_can_air_value + MV_blow_air_value + MV_fog_air_value +  MV_pad_air_value - MV_air_thscr_value - MV_air_top_value - MV_air_out_value - MV_air_mech_value - MV_airout_pad_value) / cap_VP_air_value
         out2 = (MV_air_top_value - MV_top_covin_value - MV_top_out_value) / cap_VP_top_value
         return out1, out2
-        
-'''test = Solver()
-print(test.h_elevation)
-print(test.p_Air)
-print(test.h_air)# = h_air      #chieu cao gian duoi
-print(test.p_Top) #= print(test.p_air(print(test.h_elevation + print(test.h_air)   #density of the air in the top room
-print(test.A_flr) #= A_flr      #dien tich nha kinh
-print(test.A_roof)# = A_roof
-print(test.A_side) #= A_side
-print(test.A_cov) #= A_cov
-print(test.h_top) #= h_gh - h_air      #chieu cao gian tren
-print(test.P_blow) #= P_blow    #kha nang sinh hoi nuoc cua may suoi
-print(test.o_fog) #= o_fog      #suc chua he thong phun suong
-print(test.o_pad)# o_pad      #kha nang cho hoi nuoc di qua cua tam thong gio
-print(test.n_pad) #= n_pad      #hieu suat cua he thong thong gio (trong sach khong co cai nay)
-#x_out va x_air: khong ro   
-print(test.c_leakage) #= c_leakage  #do ro cua luoi
-print(test.K_thScr) #= K_thScr      #thermal screen flux coefficient
-print(test.C_d)# = C_d
-print(test.C_w)# = C_w
-print(test.h_sideRoof) #= h_sideRoof
-print(test.h_vent) #= h_vent
-print(test.n_insScr)# = n_insScr
-print(test.o_ventForce)# = o_ventForce'''
