@@ -33,7 +33,9 @@ LAI = 3
 ##########
 class Solver:
     def __init__(self, h_elevation = 0, A_flr = 1.4 * (10 ** 4), A_roof = 1.4*(10**3), A_side = 0, A_cov = 1.8 * (10 ** 4), h_air = 3.8, h_gh = 4.2, P_blow = 1000, o_fog = 1, o_pad = 16.7, n_pad = 1, c_leakage = 10**-4,K_thScr = 0.05 * (10 ** -3), C_d = 0.75, C_w = 0.09, h_sideRoof = 2,h_vent = 0.68, n_insScr = 1, o_ventForce = 1):
-        #lay gia tri tu [van11]
+        
+        ##### LAY GIA TRI TU [van11]
+
         self.h_elevation = h_elevation  #do cao nha kinh so voi muc nuoc bien
         self.h_air = h_air      #chieu cao gian duoi
         self.A_flr = A_flr      #dien tich nha kinh
@@ -48,12 +50,12 @@ class Solver:
         self.C_w = C_w
         self.h_vent = h_vent
 
-        #Tinh toan bang cong thuc
+        ##### TINH TOAN BANG CONG THUC TUONG UNG
         self.p_Air = self.p_air(self.h_elevation)    #density of the greenhouse air        
         self.p_Top = self.p_air(self.h_elevation + self.h_air)   #density of the air in the top room
         self.n_insScr = n_insScr    #n_insScr = s_insScr * (2 - s_insScr) trong do s_insScr = 1 theo [van11]
 
-        # Gia dinh
+        ##### GIA DINH
         self.A_side = A_side    
         self.P_blow = P_blow    #kha nang sinh hoi nuoc cua may suoi
         self.n_pad = n_pad      #hieu suat cua he thong thong gio (trong sach khong co cai nay)
@@ -195,7 +197,7 @@ class Solver:
         f_VentRoof_value = self.f_VentRoof(U_thrScr, U_roof, U_side, T_air, T_out, v_wind, n_roof)
         return self.MV_845(VP_air, T_air, VP_out, T_out, f_VentRoof_value)
 
-    #Cac gia tri tham so dieu khien U duoc gia dinh cho phu hop voi mo hinh neu khong duoc truyen vao
+    #Ben canh cac gia tri co dinh, cac gia tri tham so dieu khien U duoc gia dinh cho phu hop voi mo hinh neu khong duoc truyen vao
     #x_out va x_air: khong ro nen gia dinh = 0 
     def dx(self, VP_air, T_air, VP_out, T_out, T_top, VP_top, VP_thscr, U_thrScr = 1, U_roof = 1, U_side = 0.01, v_wind = 0, n_side = 0.09, U_ventForce = 0.01, n_roof = 0.09, VP_mech = 0, T_covin = 0, U_thscr = 1, T_thscr = 0, U_mechcool = 0.01, T_mechcool = 0, U_pad = 1, U_blow = 0.01, U_fog = 0, x_pad = 0.0, x_out = 0.0, LAI = 3, rb = 275, VP_can = 0):
         MV_top_out_value = self.MV_top_out(VP_air, T_air, VP_out, T_out, U_thrScr, U_roof, U_side, v_wind, self.n_roof)
