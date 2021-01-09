@@ -91,6 +91,7 @@ writer_euler = csv.DictWriter(result_euler, fieldnames=fieldnames)
 writer_rk4 = csv.DictWriter(result_rk4, fieldnames=fieldnames)
 writer_euler.writeheader()
 writer_rk4.writeheader()
+
 for i in range(start, end):
     expectedData.append(float(climate[i]["CO2air"]))
     timeline.append(time)
@@ -111,7 +112,7 @@ for i in range(start, end):
     solver.U_Thscr = float(climate[i]["EnScr"]) / 100.0
     (CO2_air_euler, CO2_top_euler) = euler(solver.dx, time, CO2_air_euler, 5, (time + 5), CO2_out, CO2_top_euler, T_air, T_top, T_out, T_can, v_wind)
 
-    (CO2_air_rk4, CO2_top_rk4) = rk4(solver.dx, time*60, CO2_air_rk4, 5*60, (time + 5)*60, CO2_out, CO2_top_rk4, T_air, T_top, T_out, T_can, v_wind)
+    #(CO2_air_rk4, CO2_top_rk4) = rk4(solver.dx, time*60, CO2_air_rk4, 5*60, (time + 5)*60, CO2_out, CO2_top_rk4, T_air, T_top, T_out, T_can, v_wind)
 
     CO2_expected = convertPPM(float(climate[i + 1]["CO2air"]))
     mse_euler += (CO2_expected - CO2_air_euler) ** 2
@@ -140,4 +141,4 @@ plt.plot(timeline, expectedData, label="Expected")
 plt.plot(timeline, eulerData, label="Euler")
 plt.plot(timeline, rk4Data, label="RK4")
 plt.legend()
-#plt.show()
+plt.show()

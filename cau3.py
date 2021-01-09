@@ -50,12 +50,12 @@ fieldnames = ["GHtime", "Current CO2_air", "CO2_air'", "CO2_top'"]
 writer = csv.DictWriter(result, fieldnames=fieldnames)
 writer.writeheader()
 for i in range(start, end):
-
     T_air = float(climate[i]["Tair"])  # air temperature
     T_out = float(meteo[i]["Tout"])  # temperature of the air outside
     T_thscr = T_air + 1  # temperature of the thermal screen
     T_top = T_air  # temperature in the top room
     T_can = T_air + 1
+
     T_covin = T_air
     v_wind = float(meteo[i]["Windsp"])
 

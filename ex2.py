@@ -19,6 +19,7 @@ T_25_k = 298.15 #reference temperature for J_pot
 E_j = 37 * (10**3)  #activation energy for J_pot
 H_j = 22 * (10**4)  #deactivation energy for J_pot
 S_entropy = 710             #entropy term for J_pot
+
 class Dynamic:
     def __init__(self, h_elevation = 0, h_air = 3.8, h_gh = 4.2, h_vent = 0.68,U_Blow = 0, P_Blow = 0, A_Flr = 1.4*10**4, U_ExtCO2 =0, cap_ExtCO2 = 72000, U_pad = 0, cap_pad = 0, U_ThScr = 0, K_ThScr = 0.05*(10**(-3)), C_d = 0.75, C_w = 0.09, URoof = 0, USide = 0, ASide = 0, h_SideRoof = 0, S_holes = 1, n_roof = n_roofThr, U_VentForced = 0, cap_VentForced = 0):
         self.h_elevation = h_elevation  # do cao nha kinh so voi muc nuoc bien
@@ -73,7 +74,6 @@ class Dynamic:
         # (6) luong CO2 tu gian duoi den gian tren
         return f_ThScr_value*(CO2_air - CO2_top)
 
-
     def f_ThScr(self, T_air, T_top):
         #(7) toc do luu thong CO2 qua man chan nhiet
         p_mean_air = (self.p_Air + self.p_Top) / 2.0
@@ -86,7 +86,6 @@ class Dynamic:
         f_VentSide_value = self.f_VentSide(T_air, T_out, v_wind)
         f_VentForced_value = self.f_VentForced()
         return (f_VentSide_value + f_VentForced_value)*(CO2_air - CO2_out)
-
 
     def f_VentRoofSide(self, T_air, T_out, v_wind):
         try:
@@ -158,7 +157,6 @@ class Dynamic:
         third = (1 + exp((S_entropy * T_25_k - H_j) / (R * T_25_k))) / (1 + exp((S_entropy * (T_can + 273.15) - H_j) / (R * (T_can + 273.15))))
         return J_max_can * second * third
 
-
     def electronTrans(self, T_can):
         J_pot = self.calJpot(T_can)
         top1 = J_pot + alpha * par_can
@@ -181,7 +179,6 @@ class Dynamic:
         bot = 4 * (CO2_stom + 2*gamma)
         return top/bot
 
-
     def MC_air_can(self, CO2_air, T_can):  # (18) luong CO2 bi hap thu vao trong tan la
         hCBuf = 1
         P = self.photoRate(CO2_air, T_can)
@@ -199,7 +196,7 @@ class Dynamic:
         cap_CO2air = self.h_air
         cap_CO2top = self.h_top
 
-        '''print("Begin")
+        print("Begin")
         print(MC_blow_air_value)
         print(MC_ext_air_value)
         print(MC_pad_air_value)
@@ -209,7 +206,7 @@ class Dynamic:
         print(MC_top_out_value)
         print(cap_CO2air)
         print(cap_CO2top)
-        print("End")'''
+        print("End")
 
         vCO2_air = (MC_blow_air_value + MC_ext_air_value + MC_pad_air_value - MC_air_can_value - MC_air_top_value - MC_air_out_value)/cap_CO2air
         vCO2_top = (MC_air_top_value - MC_top_out_value)/cap_CO2top
