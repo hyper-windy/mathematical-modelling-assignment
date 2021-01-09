@@ -51,6 +51,7 @@ class Solver:
         #Tinh toan bang cong thuc
         self.p_Air = self.p_air(self.h_elevation)    #density of the greenhouse air        
         self.p_Top = self.p_air(self.h_elevation + self.h_air)   #density of the air in the top room
+        self.n_insScr = n_insScr    #n_insScr = s_insScr * (2 - s_insScr) trong do s_insScr = 1 theo [van11]
 
         # Gia dinh
         self.A_side = A_side    
@@ -59,12 +60,8 @@ class Solver:
         self.n_roof = n_roofThr
         self.n_side = n_roofThr
         self.h_sideRoof = h_sideRoof
-
-        self.n_insScr = n_insScr
-        self.o_ventForce = o_ventForce
-
-        
-        
+        self.o_ventForce = o_ventForce     
+          
 ###################
     def p_air(self, elevate):
         return p_air0 * exp(g * M_air * elevate /(293.15 * R))
