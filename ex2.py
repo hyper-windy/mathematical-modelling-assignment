@@ -67,6 +67,9 @@ class Dynamic:
 
     def MC_air_top(self,CO2_air, CO2_top, T_air, T_top):
         f_ThScr_value = self.f_ThScr(T_air, T_top)
+        #print("f_ThScr_value: " + str(f_ThScr_value))
+        #print("CO2_air " + str(CO2_air))
+        #print("CO2_top " + str(CO2_top))
         # (6) luong CO2 tu gian duoi den gian tren
         return f_ThScr_value*(CO2_air - CO2_top)
 
@@ -127,6 +130,7 @@ class Dynamic:
 
     def MC_top_out(self, CO2_top, CO2_out,T_air, T_out, v_wind):  # (15) luong khi di tu gian tren ra ngoai
         f_VentRoof_value = self.f_VentRoof(T_air, T_out, v_wind)
+        #print("f_VentRoof_value " + str(f_VentRoof_value))
         return f_VentRoof_value * (CO2_top - CO2_out)
 
     # f''_ventRoof
@@ -150,8 +154,8 @@ class Dynamic:
 
     def calJpot(self,T_can):
         J_max_can = LAI * J_max_leaf
-        second = exp(E_j * (T_can + 273.15 - T_25_k)/(8.314*(T_can + 273.15 - T_25_k)))
-        third = (1 + exp((S_entropy * T_25_k - H_j) / (8.314 * T_25_k))) / (1 + exp((S_entropy * (T_can + 273.15) - H_j) / (8.314 * (T_can + 273.15))))
+        second = exp(E_j * (T_can + 273.15 - T_25_k)/(R*(T_can + 273.15)*T_25_k))
+        third = (1 + exp((S_entropy * T_25_k - H_j) / (R * T_25_k))) / (1 + exp((S_entropy * (T_can + 273.15) - H_j) / (R * (T_can + 273.15))))
         return J_max_can * second * third
 
 
@@ -189,11 +193,23 @@ class Dynamic:
         MC_ext_air_value = self.MC_ext_air()
         MC_pad_air_value = self.MC_pad_air(CO2_out, CO2_air)
         MC_air_can_value = self.MC_air_can(CO2_air, T_can)
-        MC_air_top_value = self.MC_air_top(CO2_air,CO2_out,T_air, T_top)
+        MC_air_top_value = self.MC_air_top(CO2_air,CO2_top,T_air, T_top)
         MC_air_out_value = self.MC_air_out(CO2_air,CO2_out, T_air, T_out, v_wind)
         MC_top_out_value = self.MC_top_out(CO2_top, CO2_out, T_air, T_out, v_wind)
         cap_CO2air = self.h_air
         cap_CO2top = self.h_top
+
+        '''print("Begin")
+        print(MC_blow_air_value)
+        print(MC_ext_air_value)
+        print(MC_pad_air_value)
+        print(MC_air_can_value)
+        print(MC_air_top_value)
+        print(MC_air_out_value)
+        print(MC_top_out_value)
+        print(cap_CO2air)
+        print(cap_CO2top)
+        print("End")'''
 
         vCO2_air = (MC_blow_air_value + MC_ext_air_value + MC_pad_air_value - MC_air_can_value - MC_air_top_value - MC_air_out_value)/cap_CO2air
         vCO2_top = (MC_air_top_value - MC_top_out_value)/cap_CO2top

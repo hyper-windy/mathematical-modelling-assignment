@@ -141,7 +141,7 @@ for i in range(start, end):
                                    U_thscr, VP_thscr, VP_can, v_wind, T_covin)
     mse_euler += (VP_air_expected - VP_air_euler) ** 2
     mse_rk4 += (VP_air_expected - VP_air_rk4) ** 2
-    VP_mean += VP_air_expected
+    VP_mean += cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"]))
     writer_euler.writerow({"GHtime": climate[i]["GHtime"],"Current VP_air": cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"])),
                            "Next VP_air": VP_air_expected, "Predicted VP_air": VP_air_euler,
                            "Predicted VP_top": VP_top_euler})

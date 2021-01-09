@@ -38,10 +38,11 @@ def rk4(dx, x_init, func_val, step, x_fini, CO2_out, CO2_top, T_air, T_top, T_ou
 
 # Function for euler formula
 def euler(dx, x_init, func_val, step, x_fini, CO2_out, CO2_top, T_air, T_top, T_out, T_can, v_wind):
+    #print(CO2_top)
     while x_init < x_fini:
         (a, b) = dx(CO2_out=CO2_out, CO2_air=func_val, CO2_top=CO2_top, T_air=T_air, T_top=T_top, T_out=T_out, T_can=T_can, v_wind=v_wind)
-        # print("dx: " + str(a))
-        # print("dx: " + str(b))
+        #print("dx a: " + str(a))
+        #print("dx b: " + str(b))
         func_val = func_val + step * a
         CO2_top += step * b
         x_init += step
@@ -80,7 +81,7 @@ mse_euler = 0
 mse_rk4 = 0
 CO2_mean = 0
 
-timeLength = 60 * 24 * 7  # perform the prediction in 2 days (time measured in minute)
+timeLength = 24*60*7  # perform the prediction in 2 days (time measured in minute)
 end = calEndRow(timeLength, start)  # the last row that we'll use in the dataset
 result_euler = open("ex4_euler.csv", "w+")
 result_rk4 = open("ex4_rk4.csv", "w+")
@@ -90,7 +91,6 @@ writer_euler = csv.DictWriter(result_euler, fieldnames=fieldnames)
 writer_rk4 = csv.DictWriter(result_rk4, fieldnames=fieldnames)
 writer_euler.writeheader()
 writer_rk4.writeheader()
-
 for i in range(start, end):
     expectedData.append(float(climate[i]["CO2air"]))
     timeline.append(time)
@@ -109,21 +109,35 @@ for i in range(start, end):
 
     solver.URoof = (float(climate[i]["VentLee"]) + float(climate[i]["Ventwind"])) / 2 / 100.0
     solver.U_Thscr = float(climate[i]["EnScr"]) / 100.0
+    (CO2_air_euler, CO2_top_euler) = euler(solver.dx, time, CO2_air_euler, 5, (time + 5), CO2_out, CO2_top_euler, T_air, T_top, T_out, T_can, v_wind)
 
-    (CO2_air_euler, CO2_top_euler) = euler(solver.dx, time*60, CO2_air_euler, 10, (time + 5)*60, CO2_out, CO2_top_euler, T_air, T_top, T_out, T_can, v_wind)
+    (CO2_air_rk4, CO2_top_rk4) = rk4(solver.dx, time*60, CO2_air_rk4, 5*60, (time + 5)*60, CO2_out, CO2_top_rk4, T_air, T_top, T_out, T_can, v_wind)
 
-    (CO2_air_rk4, CO2_top_rk4) = rk4(solver.dx, time*60, CO2_air_rk4, 10, (time + 5)*60, CO2_out, CO2_top_rk4, T_air, T_top, T_out, T_can, v_wind)
-
-    CO2_expected = float(climate[i + 1]["CO2air"])
+    CO2_expected = convertPPM(float(climate[i + 1]["CO2air"]))
     mse_euler += (CO2_expected - CO2_air_euler) ** 2
     mse_rk4 += (CO2_expected - CO2_air_rk4) ** 2
-    CO2_mean += CO2_expected
-    writer_euler.writerow({"GHtime": climate[i]["GHtime"],"Current VP_air": cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"])),
-                           "Next VP_air": VP_air_expected, "Predicted VP_air": VP_air_euler,
-                           "Predicted VP_top": VP_top_euler})
+    CO2_mean += convertPPM(float(climate[i]["CO2air"]))
+
+    writer_euler.writerow({"GHtime": climate[i]["GHtime"],"Current CO2_air": convertPPM(float(climate[i]["CO2air"])),
+                           "Next CO2_air": CO2_expected, "Predicted CO2_air": CO2_air_euler,
+                           "Predicted CO2_top": CO2_top_euler})
     writer_rk4.writerow({"GHtime": climate[i]["GHtime"],
-                           "Current VP_air": cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"])),
-                           "Next VP_air": VP_air_expected, "Predicted VP_air": VP_air_rk4,
-                           "Predicted VP_top": VP_top_rk4})
+                           "Current CO2_air": convertPPM(float(climate[i]["CO2air"])),
+                           "Next CO2_air": CO2_expected, "Predicted CO2_air": CO2_air_rk4,
+                           "Predicted CO2_top": CO2_top_rk4})
 
     time += 5
+
+CO2_mean = CO2_mean / (end - start)
+rrmse_euler = sqrt(mse_euler) / CO2_mean * 100.0
+rrmse_rk4 = sqrt(mse_rk4)/ CO2_mean * 100.0
+
+print("RRMSE of Euler method: %f"%(rrmse_euler) + "%")
+print("RRMSE of RK4 method: %f"%(rrmse_rk4) + "%")
+
+
+plt.plot(timeline, expectedData, label="Expected")
+plt.plot(timeline, eulerData, label="Euler")
+plt.plot(timeline, rk4Data, label="RK4")
+plt.legend()
+#plt.show()
