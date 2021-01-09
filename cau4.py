@@ -134,11 +134,14 @@ for i in range(start, end):
     time += 5
 
 CO2_mean = CO2_mean / (end - start)
+mse_euler = mse_euler / (end - start)
+mse_rk4 = mse_rk4 / (end - start)
+
 rrmse_euler = sqrt(mse_euler) / CO2_mean * 100.0
 rrmse_rk4 = sqrt(mse_rk4)/ CO2_mean * 100.0
 
-print("RRMSE of Euler method: %f"%(mse_euler) + "%")
-print("RRMSE of RK4 method: %f"%(mse_rk4) + "%")
+print("RRMSE of Euler method: %f"%(rrmse_euler) + "%")
+print("RRMSE of RK4 method: %f"%(rrmse_rk4) + "%")
 
 
 plt.plot(timeline, expectedData, label="Expected")
