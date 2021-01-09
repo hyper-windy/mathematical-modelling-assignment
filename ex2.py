@@ -21,7 +21,7 @@ H_j = 22 * (10**4)  #deactivation energy for J_pot
 S_entropy = 710             #entropy term for J_pot
 
 class Dynamic:
-    def __init__(self, h_elevation = 0, h_air = 3.8, h_gh = 4.2, h_vent = 0.68,U_Blow = 0.5, P_Blow = 500000, A_Flr = 1.4*10**4, U_ExtCO2 =0.5, cap_ExtCO2 = 72000, U_pad = 0.1, cap_pad = 0, U_ThScr = 0.05, K_ThScr = 0.05*(10**(-3)), C_d = 0.75, C_w = 0.09, URoof = 0.05, USide = 0.05, ASide = 0, h_SideRoof = 0, S_holes = 1, n_roof = n_roofThr, U_VentForced = 0.05, cap_VentForced = 0):
+    def __init__(self, h_elevation = 0, h_air = 3.8, h_gh = 4.2, h_vent = 0.68,U_Blow = 0.01, P_Blow = 50000, A_Flr = 1.4*10**4, U_ExtCO2 =0.5, cap_ExtCO2 = 72000, U_pad = 0.5, cap_pad = 0, U_ThScr = 0.05, K_ThScr = 0.05*(10**(-3)), C_d = 0.75, C_w = 0.09, URoof = 0.5, USide = 0.5, ASide = 0, h_SideRoof = 0, S_holes = 1, n_roof = n_roofThr, U_VentForced = 0.0, cap_VentForced = 0):
         self.h_elevation = h_elevation  # do cao nha kinh so voi muc nuoc bien
         self.p_Air = self.p_air(self.h_elevation)  # density of the greenhouse air
         self.h_air = h_air  # chieu cao gian duoi
@@ -195,18 +195,6 @@ class Dynamic:
         MC_top_out_value = self.MC_top_out(CO2_top, CO2_out, T_air, T_out, v_wind)
         cap_CO2air = self.h_air
         cap_CO2top = self.h_top
-
-        '''print("Begin")
-        print(MC_blow_air_value)
-        print(MC_ext_air_value)
-        print(MC_pad_air_value)
-        print(MC_air_can_value)
-        print(MC_air_top_value)
-        print(MC_air_out_value)
-        print(MC_top_out_value)
-        print(cap_CO2air)
-        print(cap_CO2top)
-        print("End")'''
 
         vCO2_air = (MC_blow_air_value + MC_ext_air_value + MC_pad_air_value - MC_air_can_value - MC_air_top_value - MC_air_out_value)/cap_CO2air
         vCO2_top = (MC_air_top_value - MC_top_out_value)/cap_CO2top
