@@ -32,16 +32,21 @@ with open("data//meteo.csv", "r") as k:
         meteo.append(row)
 
 solver = Solver()
+result = open("ex5_3.csv", "w+")
+fieldnames = ["GHtime", "Current VP_air", "VP_air'", "VP_top'"]
 
-for i in range(100):
+writer = csv.DictWriter(result, fieldnames=fieldnames)
+writer.writeheader()
+
+for i in range(10):
     VP_air = cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"]))
     VP_top = VP_air
 
     T_air = float(climate[i]["Tair"])  # air temperature
     T_out = float(meteo[i]["Tout"])  # temperature of the air outside
-    T_thscr = T_air + 1     # temperature of the thermal screen
+    T_thscr = T_air     # temperature of the thermal screen
     T_top = T_air  # temperature in the top room
-    T_can = T_air + 1
+    T_can = T_air
     T_covin = T_air
     v_wind = float(meteo[i]["Windsp"])
 
@@ -51,7 +56,8 @@ for i in range(100):
 
     U_roof = (float(climate[i]["VentLee"]) + float(climate[i]["Ventwind"])) / 2 / 100.0
     U_thscr = float(climate[i]["EnScr"]) / 100
-    # print(str(i) + ": ")
+    # print(str(i) + ": "),
     
-    d = solver.dx(VP_air=VP_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top, VP_top=VP_top,T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr, VP_thscr=VP_thscr, VP_can=VP_can, v_wind=v_wind,T_covin=T_covin)
-    print("VP_air' = %f \t\t VP_top' = %f" %(d[0], d[1]))
+    (a, b) = solver.dx(VP_air=VP_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top, VP_top=VP_top,T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr, VP_thscr=VP_thscr, VP_can=VP_can, v_wind=v_wind,T_covin=T_covin)
+    writer.writerow({"GHtime": climate[i]["GHtime"],"Current VP_air": VP_air,
+                           "VP_air'": a, "VP_top'": b})
