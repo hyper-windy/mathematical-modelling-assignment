@@ -61,13 +61,7 @@ def calEndRow(timeLen, startRow):
     return startRow + timeLen // 5 + 1
 
 # determine the start of the dataset
-start = 0
-startData = "NaN"
-while startData == "NaN":
-    startData = climate[start]["CO2air"]
-    start += 1
-start -= 1
-
+start = 600
 # initialize some values
 CO2_air_euler = convertPPM(float(climate[start]["CO2air"]))     #divide by 1000 to convert ppm to mg/m^3
 CO2_top_euler = CO2_air_euler
