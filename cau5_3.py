@@ -51,7 +51,7 @@ for i in range(100):
 
     U_roof = (float(climate[i]["VentLee"]) + float(climate[i]["Ventwind"])) / 2 / 100.0
     U_thscr = float(climate[i]["EnScr"]) / 100
-    # print(str(i) + ": "),
+    # print(str(i) + ": ")
     
     d = solver.dx(VP_air=VP_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top, VP_top=VP_top,T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr, VP_thscr=VP_thscr, VP_can=VP_can, v_wind=v_wind,T_covin=T_covin)
     print("VP_air' = %f \t\t VP_top' = %f" %(d[0], d[1]))

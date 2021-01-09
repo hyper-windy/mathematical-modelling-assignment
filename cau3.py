@@ -59,7 +59,7 @@ for i in range(start, end):
     T_covin = T_air
     v_wind = float(meteo[i]["Windsp"])
 
-    CO2_out = 668   #from van11
+    CO2_out = convertPPM(409.8)   #from van11
 
     solver.URoof = (float(climate[i]["VentLee"]) + float(climate[i]["Ventwind"])) / 2 / 100.0
     solver.U_Thscr = float(climate[i]["EnScr"]) / 100.0

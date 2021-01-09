@@ -40,11 +40,14 @@ def rk4(dx, x_init, func_val, step, x_fini, CO2_out, CO2_top, T_air, T_top, T_ou
 def euler(dx, x_init, func_val, step, x_fini, CO2_out, CO2_top, T_air, T_top, T_out, T_can, v_wind):
     #print(CO2_top)
     while x_init < x_fini:
-        (a, b) = dx(CO2_out=CO2_out, CO2_air=func_val, CO2_top=CO2_top, T_air=T_air, T_top=T_top, T_out=T_out, T_can=T_can, v_wind=v_wind)
+        # (a, b) = dx(CO2_out=CO2_out, CO2_air=func_val, CO2_top=CO2_top, T_air=T_air, T_top=T_top, T_out=T_out, T_can=T_can, v_wind=v_wind)
+        (a, b) = (step * k1 for k1 in
+                            dx(CO2_out=CO2_out, CO2_air=func_val, CO2_top=CO2_top, T_air=T_air, T_top=T_top,
+                               T_out=T_out, T_can=T_can, v_wind=v_wind))
         #print("dx a: " + str(a))
         #print("dx b: " + str(b))
-        func_val = func_val + step * a
-        CO2_top += step * b
+        func_val = func_val + a
+        CO2_top += b
         x_init += step
     return func_val, CO2_top
 
@@ -93,26 +96,27 @@ writer_euler.writeheader()
 writer_rk4.writeheader()
 
 for i in range(start, end):
-    expectedData.append(float(climate[i]["CO2air"]))
+    expectedData.append(convertPPM(float(climate[i]["CO2air"])))
     timeline.append(time)
     eulerData.append(CO2_air_euler)
     rk4Data.append(CO2_air_rk4)
 
     T_air = float(climate[i]["Tair"])  # air temperature
     T_out = float(meteo[i]["Tout"])  # temperature of the air outside
-    T_thscr = T_air + 1  # temperature of the thermal screen
+    T_thscr = T_air - 1  # temperature of the thermal screen
     T_top = T_air  # temperature in the top room
-    T_can = T_air + 1
+    T_can = T_air - 1
     T_covin = T_air
     v_wind = float(meteo[i]["Windsp"])
-
-    CO2_out = 668   #from van11
-
     solver.URoof = (float(climate[i]["VentLee"]) + float(climate[i]["Ventwind"])) / 2 / 100.0
     solver.U_Thscr = float(climate[i]["EnScr"]) / 100.0
-    (CO2_air_euler, CO2_top_euler) = euler(solver.dx, time, CO2_air_euler, 5, (time + 5), CO2_out, CO2_top_euler, T_air, T_top, T_out, T_can, v_wind)
 
-    #(CO2_air_rk4, CO2_top_rk4) = rk4(solver.dx, time*60, CO2_air_rk4, 5*60, (time + 5)*60, CO2_out, CO2_top_rk4, T_air, T_top, T_out, T_can, v_wind)
+    CO2_out = convertPPM(409.8)   #from van11
+
+    (CO2_air_euler, CO2_top_euler) = euler(solver.dx, time, CO2_air_euler, 0.5, (time + 5), CO2_out, CO2_top_euler, T_air, T_top, T_out, T_can, v_wind)
+
+
+    (CO2_air_rk4, CO2_top_rk4) = rk4(solver.dx, time, CO2_air_rk4, 0.5, (time + 5), CO2_out, CO2_top_rk4, T_air, T_top, T_out, T_can, v_wind)
 
     CO2_expected = convertPPM(float(climate[i + 1]["CO2air"]))
     mse_euler += (CO2_expected - CO2_air_euler) ** 2
@@ -133,8 +137,8 @@ CO2_mean = CO2_mean / (end - start)
 rrmse_euler = sqrt(mse_euler) / CO2_mean * 100.0
 rrmse_rk4 = sqrt(mse_rk4)/ CO2_mean * 100.0
 
-print("RRMSE of Euler method: %f"%(rrmse_euler) + "%")
-print("RRMSE of RK4 method: %f"%(rrmse_rk4) + "%")
+print("RRMSE of Euler method: %f"%(mse_euler) + "%")
+print("RRMSE of RK4 method: %f"%(mse_rk4) + "%")
 
 
 plt.plot(timeline, expectedData, label="Expected")
