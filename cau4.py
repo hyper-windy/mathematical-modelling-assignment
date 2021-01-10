@@ -29,7 +29,7 @@ def rk4(dx, x_init, func_val, step, x_fini, CO2_out, CO2_top, T_air, T_top, T_ou
         (k3_air, k3_top) = (step * k3 for k3 in
                             dx(CO2_out=CO2_out, CO2_air=func_val+0.5*k2_air, CO2_top=CO2_top+0.5*k2_top, T_air=T_air, T_top=T_top, T_out=T_out, T_can=T_can, v_wind=v_wind))
         (k4_air, k4_top) = (step * k4 for k4 in
-                            dx(CO2_out=CO2_out, CO2_air=func_val+0.5*k3_air, CO2_top=CO2_top+0.5*k3_top, T_air=T_air, T_top=T_top, T_out=T_out, T_can=T_can, v_wind=v_wind))
+                            dx(CO2_out=CO2_out, CO2_air=func_val+k3_air, CO2_top=CO2_top+0.5*k3_top, T_air=T_air, T_top=T_top, T_out=T_out, T_can=T_can, v_wind=v_wind))
         func_val = func_val + (1.0 / 6.0) * (k1_air + 2 * k2_air + 2 * k3_air + k4_air)
         CO2_top += (1.0 / 6.0) * (k1_top + 2 * k2_top + 2 * k3_top + k4_top)
         x_init += step
@@ -107,10 +107,9 @@ for i in range(start, end):
 
     CO2_out = convertPPM(409.8)   #from van11
 
-    (CO2_air_euler, CO2_top_euler) = euler(solver.dx, time, CO2_air_euler, 0.5, (time + 5), CO2_out, CO2_top_euler, T_air, T_top, T_out, T_can, v_wind)
+    (CO2_air_euler, CO2_top_euler) = euler(solver.dx, time, CO2_air_euler, 1/6.0, (time + 5), CO2_out, CO2_top_euler, T_air, T_top, T_out, T_can, v_wind)
 
-
-    (CO2_air_rk4, CO2_top_rk4) = rk4(solver.dx, time, CO2_air_rk4, 0.5, (time + 5), CO2_out, CO2_top_rk4, T_air, T_top, T_out, T_can, v_wind)
+    (CO2_air_rk4, CO2_top_rk4) = rk4(solver.dx, time, CO2_air_rk4, 1/6.0, (time + 5), CO2_out, CO2_top_rk4, T_air, T_top, T_out, T_can, v_wind)
 
     CO2_expected = convertPPM(float(climate[i + 1]["CO2air"]))
     mse_euler += (CO2_expected - CO2_air_euler) ** 2

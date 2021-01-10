@@ -20,8 +20,8 @@ def rk4(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_top,
                                VP_top=VP_top + 0.5 * k2_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr,
                                VP_thscr=VP_thscr, VP_can=VP_can, v_wind=v_wind,T_covin=T_covin))
         (k4_air, k4_top) = (step * k4 for k4 in
-                            dx(VP_air=func_val + 0.5 * k3_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
-                               VP_top=VP_top + 0.5 * k3_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr,
+                            dx(VP_air=func_val + k3_air, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top,
+                               VP_top=VP_top + k3_top, T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr,
                                VP_thscr=VP_thscr, VP_can=VP_can, v_wind=v_wind,T_covin=T_covin))
         func_val = func_val + (1.0 / 6.0) * (k1_air + 2 * k2_air + 2 * k3_air + k4_air)
         VP_top += (1.0 / 6.0) * (k1_top + 2 * k2_top + 2 * k3_top + k4_top)
@@ -35,8 +35,6 @@ def euler(dx, x_init, func_val, step, x_fini, T_air, VP_out, T_out, T_top, VP_to
     while x_init < x_fini:
         (a, b) = dx(VP_air=func_val, T_air=T_air, VP_out=VP_out, T_out=T_out, T_top=T_top, VP_top=VP_top,
                     T_thscr=T_thscr, U_roof=U_roof, U_thscr=U_thscr, VP_thscr=VP_thscr, VP_can=VP_can, v_wind=v_wind,T_covin=T_covin)
-        # print("dx: " + str(a))
-        # print("dx: " + str(b))
         func_val = func_val + step * a
         VP_top += step * b
         x_init += step

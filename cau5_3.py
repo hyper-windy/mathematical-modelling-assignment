@@ -38,7 +38,7 @@ fieldnames = ["GHtime", "Current VP_air", "VP_air'", "VP_top'"]
 writer = csv.DictWriter(result, fieldnames=fieldnames)
 writer.writeheader()
 
-for i in range(10):
+for i in range(3,10):
     VP_air = cal_VP(float(climate[i]["RHair"]), float(climate[i]["Tair"]))
     VP_top = VP_air #Gia dinh
 
