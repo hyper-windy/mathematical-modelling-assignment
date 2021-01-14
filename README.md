@@ -7,4 +7,4 @@ Collaborator: Tuan Quach Minh,Tien Dung Vo Van, Hai Dang Nguyen Truong, Dat Nguy
 **File docx cho note** https://docs.google.com/document/d/1lA_D1NqYMaEXS2GiEHaDFOrbx4UDvTwMk7RtN_zs4SA/edit?usp=sharing  
 **File overleaf để viết report** https://www.overleaf.com/3575116415dztqnzngwwcm
 
-## Đăng nhập bằng mail trường nhá
+## Đăng nhập bằng mail trường
